@@ -1,0 +1,16 @@
+{
+  "name": "chai-aur-backend",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Learning Backend with creating project with the help of Chai or code tutorial video",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "license": "ISC",
+  "author": "Aditya",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
