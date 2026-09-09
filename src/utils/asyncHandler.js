@@ -5,6 +5,10 @@
 // Why we Use this function ?  
 // answer => when we use mongoose for CURD operation so, when the request is taking time or aslo we need to error handling . But mongoose or there opereation we use everywhere so we can not write try Catch or error handling or async await on our code that is repitation so we create a function that can create once at a time  and use it every where in our folder 
 
+
+// what is higher order function ?
+//  answer => A function that receives another function as an argument OR returns another function.
+
 const asyncHandler = (requestHandler) => { 
   return async  (req,res,next) => {
        
