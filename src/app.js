@@ -14,4 +14,14 @@ app.use(express.urlencoded({extended: true, limit:'16kb'}))
 app.use(express.static('Public'))
 app.use(cookieParser())
 
-export default app
+
+// //////////////
+
+
+// routes import  segrigation of files
+import router from '../src/routes/user.routes.js';
+
+//routes declaration
+app.use('/api/v1/users', router)
+
+export default app  

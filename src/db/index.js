@@ -10,6 +10,8 @@ const connectDB = async () =>{
         
     } catch (error) {
         console.error('MONGODB connection FAILD ', error)
+        
+        // it is just a method of express and it is say that end the process which is running at the same time with exit code in node
         process.exit(1)
     }
 }

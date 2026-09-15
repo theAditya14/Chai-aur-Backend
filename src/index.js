@@ -1,7 +1,7 @@
 import  dotenv from 'dotenv'
 import connectDB from "./db/index.js";
 import app from './app.js';
-import asyncHandler from './utils/asyncHandler.js';
+import {asyncHandler} from './utils/asyncHandler.js';
 
 
 dotenv.config({path:'./.env'})
