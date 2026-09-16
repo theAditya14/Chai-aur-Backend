@@ -43,3 +43,16 @@ I am trying to build my backend knowledge step by step:
 I know I still have a lot to learn, but I am enjoying the process and trying to understand concepts deeply instead of just copying code.
 
 🚀 **This is just the beginning of my Backend Development Journey.**
+
+
+<!-- what i do in registration  -->
+
+    step 1 - get user details from frontend
+    step 2 - validation - not empty
+    step 3 - check if user already exists: username,email
+    step 4 - check for images, check for avatar
+    step 5 - upload them to cloudinary , avatar
+    step 6 - create user object - create entry in db
+    step 7 - remove password and refresh token field from response
+    step 8 - check for user creation 
+    step 9 - return res
