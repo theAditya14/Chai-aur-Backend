@@ -22,4 +22,4 @@ router.route("/register").post(
 
 
 
-export default router
+export { router };
