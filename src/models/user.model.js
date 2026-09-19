@@ -29,13 +29,13 @@ const userSchema = new Schema(
             type: String,
             required: [true, 'Password is required']
         },
-        // avatar: {
-        //     type: String, // cloudinary url
+        avatar: {
+            type: String, // cloudinary url
         
-        // },
-        // coverImage: {
-        //     type: String, // cloudinary url
-        // },
+        },
+        coverImage: {
+            type: String, // cloudinary url
+        },
         watchHistory: [
             {
                 type: Schema.Types.ObjectId,
