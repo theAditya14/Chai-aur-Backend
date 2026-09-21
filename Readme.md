@@ -60,12 +60,12 @@ I know I still have a lot to learn, but I am enjoying the process and trying to 
 ------------------
 Login System . 
 
-  //1. we need to get users passsword ,email,username
-  //2. check the email or username is given by user or not
-  //3.find the user .  yes/not
-  //4. check passowrd is correct or not .
-  //5. access and refresh token check or send   (some code ,top of the code)
-  //6. res cookies.
+  1. we need to get users passsword ,email,username
+  2. check the email or username is given by user or not
+  3.find the user .  yes/not
+  4. check passowrd is correct or not .
+  5. access and refresh token check or send   (some code ,top of the code)
+  6. res cookies.
 
 <img width="965" height="791" alt="Screenshot 2026-09-21 161204" src="https://github.com/user-attachments/assets/e21f7f91-13cd-408d-a188-e871211ec0ca" />
 
