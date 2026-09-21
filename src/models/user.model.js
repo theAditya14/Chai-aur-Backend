@@ -10,7 +10,8 @@ const userSchema = new Schema(
             unique: true,
             lowercase: true,
             trim: true, 
-            index: true
+            index: true,
+            limit: 20
         },
         email: {
             type: String,
@@ -22,8 +23,8 @@ const userSchema = new Schema(
         fullName: {
             type: String,
             required: true,
-            // trim: true, 
-            // index: true
+            trim: true, 
+            index: true
         },
          password: {
             type: String,
@@ -36,6 +37,9 @@ const userSchema = new Schema(
         coverImage: {
             type: String, // cloudinary url
         },
+         refreshToken: {
+            type: String
+        },
         watchHistory: [
             {
                 type: Schema.Types.ObjectId,
@@ -43,9 +47,7 @@ const userSchema = new Schema(
             }
         ],
        
-        refreshToken: {
-            type: String
-        }
+       
 
     },
     {
