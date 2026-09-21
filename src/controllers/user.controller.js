@@ -7,12 +7,12 @@ import uploadOnCloudinary from "../utils/cloudnary.js";
 
 //5. access and refresh token check or send (logged in wala part);
 
-const generateAccess_or_Refresh_Token = async (user_id) => {
+const generateAccess_or_Refresh_Token = async (userId) => {
   try {
-    const user = await User.findById(user_id);
+    const user = await User.findById(userId);
 
-    const refreshToken = generateRefreshToke();
-    const accessToken = generateAccessToke();
+    const refreshToken =  user.generateRefreshToke();
+    const accessToken = user.generateAccessToke();
 
     user.refreshToken = await refreshToken;
     user.save({ validateBeforeSave: false });
@@ -104,7 +104,7 @@ const LoggedInUser = asyncHandler(async (req, res) => {
   //5. access and refresh token check or send   (some code ,top of the code)
   //6. res cookies.
 
-  ////*********** */ */
+ 
 
   //1. we need to get users passsword ,email,username
 
@@ -112,7 +112,7 @@ const LoggedInUser = asyncHandler(async (req, res) => {
 
   //2. check the email or username is given by user or not
 
-  if (!username || !email) {
+  if (!username && !email) {
     throw new ApiError(500, "username or email is required!");
   }
 
@@ -121,7 +121,7 @@ const LoggedInUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({
     $or: [{ username }, { email }],
   });
-  console.log(user);
+  // console.log(user);
 
   if (!user) {
     throw new ApiError(400, "User is not avelaible");
@@ -136,15 +136,13 @@ const LoggedInUser = asyncHandler(async (req, res) => {
   }
 
   //5. access and refresh token check or send
-  const { accessToken, refreshToken } = await generateAccess_or_Refresh_Token(
-    user._id,
-  );
+  const { accessToken, refreshToken } = await generateAccess_or_Refresh_Token(user._id);
 
   const LoggIn_User = await User.findById(user._id).select(
     " -password -refreshToken",
   );
 
-  console.log("LoggIn_User : ", LoggIn_User);
+  // console.log("LoggIn_User : ", LoggIn_User);
 
   const option = { httpOnly : true, secure : true}  // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi 
 
@@ -152,22 +150,23 @@ const LoggedInUser = asyncHandler(async (req, res) => {
   .cookie("accessToken" , accessToken , option)
   .cookie("refreshToken", refreshToken, option)
   .json(
-      new ApiError(
+      new ApiResponse(
       200,
       { 
         user : LoggIn_User , accessToken, refreshToken  // hum log idher q bej rhe h access or refresh token jab humne cookies me bej diya h to . hum isliye bej rhe h ki koi user apne browser me mannualy save karna chata h ya fir ko ye application , mobile app me run karna chata h .to uske liye cookie ke saat response bej diya 
       } ,
       "User Loggind In Successfully."
+ 
     )
   )
 
-  console.log( "check for cookies in response",res)
+  // console.log( "check for cookies in response",res)
 });
 
 
 // Loggoute User;
 
-const LoggouUser = asyncHandler((req,res) =>{
+const LoggoutUser = asyncHandler((req,res) =>{
   User.findByIdAndUpdate(
     req.verifyToken._id,
     {

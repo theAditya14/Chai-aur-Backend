@@ -1,10 +1,10 @@
 // ye middlewere check kare ga ki user verify h ya nhi .  (Is this request actually coming from an authenticated user?)
-import ApiError from "../utils/apiError";
-import { asyncHandler } from "../utils/asyncHandler";
+import ApiError from "../utils/apiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from  'jsonwebtoken'
-import User from '../models/user.model'
+import User from '../models/user.model.js'
 
-export const verifyJWT = asyncHandler( async(req, _, next) =>{
+  const verifyJWT = asyncHandler( async(req, _, next) =>{
        
  try {
      const Token =  req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")   //(req.header -> auger req.cookies ke under accessToken nhi aya to req.header me check karo or Bearer ko hata to or sirf acccessToken de do)
@@ -33,3 +33,6 @@ export const verifyJWT = asyncHandler( async(req, _, next) =>{
     throw new ApiError(401,error?.message || "Invalid Access Token")
  }
 });
+
+
+export default verifyJWT;
