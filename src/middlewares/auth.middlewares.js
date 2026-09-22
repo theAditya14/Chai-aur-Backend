@@ -19,6 +19,7 @@ import User from '../models/user.model.js'
       // idher hum check kar rhe h ki jo token aya h humare pass me wo shi h ya nhi . to usko verify kate /decode karte h
    
      const decodeToken =  jwt.verify(Token, process.env.ACCESS_TOKEN_SECRET)
+         console.log(decodeToken)
    
      const user  =  await User.findById(decodeToken?._id).select("-password -refreshToken");
    

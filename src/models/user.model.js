@@ -56,7 +56,7 @@ const userSchema = new Schema(
 )
 
 //it is encrypte password before save in db .
-userSchema.pre("save", async function (next) {  // idher ek baad dyan rakni h ki auger async use kar rhe h to next() ka use nhi karna h .
+userSchema.pre("save", async function () {  // idher ek baad dyan rakni h ki auger async use kar rhe h to next() ka use nhi karna h .
     
     if (!this.isModified("password")) return  // this line is check ki sirf password hi change houa h ya sab kuch .
 

@@ -2,8 +2,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import User from "../models/user.model.js";
+import isPasswordCorrect from "../models/user.model.js";
 import ApiResponse from "../utils/apiResponse.js";
 import uploadOnCloudinary from "../utils/cloudnary.js";
+
 
 //5. access and refresh token check or send (logged in wala part);
 
@@ -178,7 +180,7 @@ const LoggoutUser = asyncHandler( async (req,res) =>{
     }
   )
 
-   const option = { httpOnly : true, secure : false} 
+   const option = { httpOnly : true, secure : true} 
 
    return res
    .status(200)
@@ -246,6 +248,53 @@ const generate_Access_Token = asyncHandler(async () => {
 })
  
 
+// Change Password  from user : 
+
+const Change_Password = asyncHandler(async (req,res) => {
+  // step 1 - give old or new password form user :
+  // step 2 - find the user 
+  // step 3 - check the old password is correct or not :
+  // step 4 - update database;
+  // step 5 - send conformation message : 
+  
+  
+  // step 1 - give old or new password form user :
+  const {oldPassword, newPassword} = req.body;
+  
+  if(!oldPassword && !newPassword){
+    throw new ApiError(404, "new or old password is requires !")
+  }
+  // step 2 - find the user 
+  const user  = await User.findById(req.verifyToken?._id)
+  
+  // step 3 - check the old password is correct or not :
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+  
+   if(!isPasswordCorrect){
+     throw new ApiError(404, "Old password is not match !")
+    }
+    
+    // step 4 - update database;
+    user.password = newPassword;
+    await user.save( {validateBeforeSave : false} );
 
 
-export { registerUser, LoggedInUser,LoggoutUser };
+    return res
+    .status(200)
+    .json(
+      new ApiResponse(200, 
+        user,
+        "Password change successfully..")
+    )
+
+    
+
+
+})
+
+
+
+
+
+
+export { registerUser, LoggedInUser,LoggoutUser,Change_Password };
