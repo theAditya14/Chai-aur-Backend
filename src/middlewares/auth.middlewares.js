@@ -9,7 +9,7 @@ import User from '../models/user.model.js'
  try {
      const Token =  req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")   //(req.header -> auger req.cookies ke under accessToken nhi aya to req.header me check karo or Bearer ko hata to or sirf acccessToken de do)
     
-      console.log( "CHECK REQUEST HEADER: ",req.header("Authorization"))
+      console.log( "CHECK REQUEST HEADER: ",Token)
     
    
       if (!Token) {
@@ -18,7 +18,7 @@ import User from '../models/user.model.js'
    
       // idher hum check kar rhe h ki jo token aya h humare pass me wo shi h ya nhi . to usko verify kate /decode karte h
    
-     const decodeToken =  jwt.verify(Token, proccess.env.ACCESS_TOKEN_SECRET)
+     const decodeToken =  jwt.verify(Token, process.env.ACCESS_TOKEN_SECRET)
    
      const user  =  await User.findById(decodeToken?._id).select("-password -refreshToken");
    

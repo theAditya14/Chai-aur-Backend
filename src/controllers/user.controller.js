@@ -104,7 +104,6 @@ const LoggedInUser = asyncHandler(async (req, res) => {
   //5. access and refresh token check or send   (some code ,top of the code)
   //6. res cookies.
 
- 
 
   //1. we need to get users passsword ,email,username
 
@@ -144,7 +143,7 @@ const LoggedInUser = asyncHandler(async (req, res) => {
 
   // console.log("LoggIn_User : ", LoggIn_User);
 
-  const option = { httpOnly : true, secure : true}  // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi 
+  const option = { httpOnly : true, secure : false}  // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi 
 
   return  res.status(200)
   .cookie("accessToken" , accessToken , option)
@@ -187,6 +186,65 @@ const LoggoutUser = asyncHandler((req,res) =>{
    .clearCookie("refreshToken", option)
    .json(new ApiResponse(200, {}, "User Logged Out Successfully"))
 })
+
+
+
+// refresh access token : 
+
+const generate_Access_Token = asyncHandler(async () => {
+  
+   // step 1 - user send cookies -> refresh token ;
+   // step 2 - check the refresh token is valid or not ;
+   // step 3  - find the user in db ; 
+   // step 4 - if incomming_refresh_token is equal to the refresh token which is stored in database;
+   // step 5 - generate access token or new Refresh token 
+   // step 6 - send response user;
+  // step 1 - user send cookies -> refresh token ;
+  
+  const incomming_Refresh_Token = res.cookies?.refreshToken ||  res.body.refreshToken ;
+
+  if(!incomming_Refresh_Token){
+    throw new ApiError(401, "Unauthorized User!");
+  }
+  // step 2 - check the refresh token is valid or not ;
+  const decode_Token =  jwt.verify(incomming_Refresh_Token , process.env.REFRESH_TOKEN_SECRET);
+  
+  // step 3  - find the user in db ; 
+  const user = await User.findById(decode_Token?._id).select("-password -refreshToken");
+
+  if(!user){
+    throw new ApiError(400, "User Unauthoried/not user found")
+  }
+  
+  // step 4 - if incomming_refresh_token is equal to the refresh token which is stored in database;
+  if(!incomming_Refresh_Token !== user?.refreshToken){
+    throw new ApiError(401, "User Unauthorized")
+  }
+
+  // step 5 - generate access token or new Refresh token 
+   const {AccessToken, newRefreshToken}  = generateAccess_or_Refresh_Token(user._id);
+
+  const option = { httpOnly : true, secure : false}  // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi 
+   
+  // step 6 - send response user;
+
+  return res 
+  .status(200)
+  .cookie("AccessToken",AccessToken )
+  .cookie("newRefreshToken",newRefreshToken )
+  .json(
+    new ApiResponse(
+      200,
+      {AccessToken,newRefreshToken},
+      "genreate new Access token "
+    )
+  )
+ 
+
+
+
+})
+ 
 
 
 
