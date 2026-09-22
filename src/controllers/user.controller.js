@@ -165,12 +165,12 @@ const LoggedInUser = asyncHandler(async (req, res) => {
 
 // Loggoute User;
 
-const LoggoutUser = asyncHandler((req,res) =>{
-  User.findByIdAndUpdate(
-    req.verifyToken._id,
+const LoggoutUser = asyncHandler( async (req,res) =>{
+  await User.findByIdAndUpdate(
+    req.verifyToken._id, 
     {
       $set: {
-          refreshToken : undefined
+          refreshToken : null
       }
     }, 
     {
@@ -178,7 +178,7 @@ const LoggoutUser = asyncHandler((req,res) =>{
     }
   )
 
-   const option = { httpOnly : true, secure : true} 
+   const option = { httpOnly : true, secure : false} 
 
    return res
    .status(200)
