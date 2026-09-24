@@ -2,9 +2,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import User from "../models/user.model.js";
-import isPasswordCorrect from "../models/user.model.js";
+// import isPasswordCorrect from "../models/user.model.js";
 import ApiResponse from "../utils/apiResponse.js";
 import uploadOnCloudinary from "../utils/cloudnary.js";
+
 
 
 //5. access and refresh token check or send (logged in wala part);
@@ -168,6 +169,7 @@ const LoggedInUser = asyncHandler(async (req, res) => {
 // Loggoute User;
 
 const LoggoutUser = asyncHandler( async (req,res) =>{
+
   await User.findByIdAndUpdate(
     req.verifyToken._id, 
     {
@@ -282,8 +284,8 @@ const Change_Password = asyncHandler(async (req,res) => {
     return res
     .status(200)
     .json(
-      new ApiResponse(200, 
-        user,
+      new ApiResponse(200,
+         {},
         "Password change successfully..")
     )
 
@@ -293,8 +295,54 @@ const Change_Password = asyncHandler(async (req,res) => {
 })
 
 
+// Update Avatar from User : 
+
+const Update_Avatar = asyncHandler( async (req,res) => {
+    // step 1 : get Avatar from user;
+    // step 2 : check is avatar is get or not ?:
+    // step 3 - find the user ;
+    //  step 4 : auger avatar get hui h new to usko save  kardo  db me or clodinary per bej do;
+    
+    // ////
+
+    // step 1 : get Avatar from user;
+
+    const localFilePath = req.file?.path;
+
+    if(!localFilePath){
+      throw new ApiError(502,"File not change")
+    };
+
+    // const user  = await User.findById(req.verifyToken?._id)
+    const avatar = await uploadOnCloudinary(localFilePath);
+    if(!avatar.url){
+      throw new ApiError(505, "avatar file not uploded")
+    }
+    
+  const user   =   await User.findByIdAndUpdate(
+    req.verifyToken?._id, 
+    {
+      $set:{
+          avatar : avatar.url 
+      }
+    }, 
+    {
+      new : true
+    }
+  )
+
+
+    return res
+    .status(200)
+    .json(
+       new  ApiResponse(200, user, "Avatar Update!"));
+              
+});
 
 
 
 
-export { registerUser, LoggedInUser,LoggoutUser,Change_Password };
+
+
+
+export { registerUser, LoggedInUser,LoggoutUser,Change_Password,Update_Avatar};
