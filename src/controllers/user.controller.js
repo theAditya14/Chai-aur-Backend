@@ -2,11 +2,8 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import User from "../models/user.model.js";
-// import isPasswordCorrect from "../models/user.model.js";
 import ApiResponse from "../utils/apiResponse.js";
 import uploadOnCloudinary from "../utils/cloudnary.js";
-
-
 
 //5. access and refresh token check or send (logged in wala part);
 
@@ -14,7 +11,7 @@ const generateAccess_or_Refresh_Token = async (userId) => {
   try {
     const user = await User.findById(userId);
 
-    const refreshToken =  user.generateRefreshToke();
+    const refreshToken = user.generateRefreshToke();
     const accessToken = user.generateAccessToke();
 
     user.refreshToken = await refreshToken;
@@ -29,8 +26,7 @@ const generateAccess_or_Refresh_Token = async (userId) => {
   }
 };
 
-
-//create/Register User :- 
+//create/Register User :-
 
 const registerUser = asyncHandler(async (req, res) => {
   //get user details from frontend .
@@ -96,8 +92,6 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, resUserData, "User created successfully"));
 });
 
-
-
 //Login User
 const LoggedInUser = asyncHandler(async (req, res) => {
   //1. we need to get users passsword ,email,username
@@ -106,7 +100,6 @@ const LoggedInUser = asyncHandler(async (req, res) => {
   //4. check passowrd is correct or not .
   //5. access and refresh token check or send   (some code ,top of the code)
   //6. res cookies.
-
 
   //1. we need to get users passsword ,email,username
 
@@ -138,7 +131,9 @@ const LoggedInUser = asyncHandler(async (req, res) => {
   }
 
   //5. access and refresh token check or send
-  const { accessToken, refreshToken } = await generateAccess_or_Refresh_Token(user._id);
+  const { accessToken, refreshToken } = await generateAccess_or_Refresh_Token(
+    user._id,
+  );
 
   const LoggIn_User = await User.findById(user._id).select(
     " -password -refreshToken",
@@ -146,203 +141,293 @@ const LoggedInUser = asyncHandler(async (req, res) => {
 
   // console.log("LoggIn_User : ", LoggIn_User);
 
-  const option = { httpOnly : true, secure : false}  // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi 
+  const option = { httpOnly: true, secure: false }; // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi
 
-  return  res.status(200)
-  .cookie("accessToken" , accessToken , option)
-  .cookie("refreshToken", refreshToken, option)
-  .json(
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
+    .json(
       new ApiResponse(
-      200,
-      { 
-        user : LoggIn_User , accessToken, refreshToken  // hum log idher q bej rhe h access or refresh token jab humne cookies me bej diya h to . hum isliye bej rhe h ki koi user apne browser me mannualy save karna chata h ya fir ko ye application , mobile app me run karna chata h .to uske liye cookie ke saat response bej diya 
-      } ,
-      "User Loggind In Successfully."
- 
-    )
-  )
+        200,
+        {
+          user: LoggIn_User,
+          accessToken,
+          refreshToken, // hum log idher q bej rhe h access or refresh token jab humne cookies me bej diya h to . hum isliye bej rhe h ki koi user apne browser me mannualy save karna chata h ya fir ko ye application , mobile app me run karna chata h .to uske liye cookie ke saat response bej diya
+        },
+        "User Loggind In Successfully.",
+      ),
+    );
 
   // console.log( "check for cookies in response",res)
 });
 
-
 // Loggoute User;
 
-const LoggoutUser = asyncHandler( async (req,res) =>{
-
+const LoggoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
-    req.verifyToken._id, 
+    req.verifyToken._id,
     {
       $set: {
-          refreshToken : null
-      }
-    }, 
+        refreshToken: null,
+      },
+    },
     {
-      new : true
-    }
-  )
+      new: true,
+    },
+  );
 
-   const option = { httpOnly : true, secure : true} 
+  const option = { httpOnly: true, secure: true };
 
-   return res
-   .status(200)
-   .clearCookie("accessToken", option)
-   .clearCookie("refreshToken", option)
-   .json(new ApiResponse(200, {}, "User Logged Out Successfully"))
-})
+  return res
+    .status(200)
+    .clearCookie("accessToken", option)
+    .clearCookie("refreshToken", option)
+    .json(new ApiResponse(200, {}, "User Logged Out Successfully"));
+});
 
-
-
-// refresh access token : 
+// refresh access token :
 
 const generate_Access_Token = asyncHandler(async () => {
-  
-   // step 1 - user send cookies -> refresh token ;
-   // step 2 - check the refresh token is valid or not ;
-   // step 3  - find the user in db ; 
-   // step 4 - if incomming_refresh_token is equal to the refresh token which is stored in database;
-   // step 5 - generate access token or new Refresh token 
-   // step 6 - send response user;
   // step 1 - user send cookies -> refresh token ;
-  
-  const incomming_Refresh_Token = res.cookies?.refreshToken ||  res.body.refreshToken ;
+  // step 2 - check the refresh token is valid or not ;
+  // step 3  - find the user in db ;
+  // step 4 - if incomming_refresh_token is equal to the refresh token which is stored in database;
+  // step 5 - generate access token or new Refresh token
+  // step 6 - send response user;
+  // step 1 - user send cookies -> refresh token ;
 
-  if(!incomming_Refresh_Token){
+  const incomming_Refresh_Token =
+    res.cookies?.refreshToken || res.body.refreshToken;
+
+  if (!incomming_Refresh_Token) {
     throw new ApiError(401, "Unauthorized User!");
   }
   // step 2 - check the refresh token is valid or not ;
-  const decode_Token =  jwt.verify(incomming_Refresh_Token , process.env.REFRESH_TOKEN_SECRET);
-  
-  // step 3  - find the user in db ; 
-  const user = await User.findById(decode_Token?._id).select("-password -refreshToken");
+  const decode_Token = jwt.verify(
+    incomming_Refresh_Token,
+    process.env.REFRESH_TOKEN_SECRET,
+  );
 
-  if(!user){
-    throw new ApiError(400, "User Unauthoried/not user found")
+  // step 3  - find the user in db ;
+  const user = await User.findById(decode_Token?._id).select(
+    "-password -refreshToken",
+  );
+
+  if (!user) {
+    throw new ApiError(400, "User Unauthoried/not user found");
   }
-  
+
   // step 4 - if incomming_refresh_token is equal to the refresh token which is stored in database;
-  if(!incomming_Refresh_Token !== user?.refreshToken){
-    throw new ApiError(401, "User Unauthorized")
+  if (!incomming_Refresh_Token !== user?.refreshToken) {
+    throw new ApiError(401, "User Unauthorized");
   }
 
-  // step 5 - generate access token or new Refresh token 
-   const {AccessToken, newRefreshToken}  = generateAccess_or_Refresh_Token(user._id);
+  // step 5 - generate access token or new Refresh token
+  const { AccessToken, newRefreshToken } = generateAccess_or_Refresh_Token(
+    user._id,
+  );
 
-  const option = { httpOnly : true, secure : false}  // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi 
-   
+  const option = { httpOnly: true, secure: false }; // ise hoga ye ki jo cookies / refresh token h vo user change nhi karsata in browser pe . ye sirf sever se hi chang hogi
+
   // step 6 - send response user;
 
-  return res 
-  .status(200)
-  .cookie("AccessToken",AccessToken )
-  .cookie("newRefreshToken",newRefreshToken )
-  .json(
-    new ApiResponse(
-      200,
-      {AccessToken,newRefreshToken},
-      "genreate new Access token "
-    )
-  )
- 
+  return res
+    .status(200)
+    .cookie("AccessToken", AccessToken)
+    .cookie("newRefreshToken", newRefreshToken)
+    .json(
+      new ApiResponse(
+        200,
+        { AccessToken, newRefreshToken },
+        "genreate new Access token ",
+      ),
+    );
+});
 
+// Change Password  from user :
 
-
-})
- 
-
-// Change Password  from user : 
-
-const Change_Password = asyncHandler(async (req,res) => {
+const Change_Password = asyncHandler(async (req, res) => {
   // step 1 - give old or new password form user :
-  // step 2 - find the user 
+  // step 2 - find the user
   // step 3 - check the old password is correct or not :
   // step 4 - update database;
-  // step 5 - send conformation message : 
-  
-  
+  // step 5 - send conformation message :
+
   // step 1 - give old or new password form user :
-  const {oldPassword, newPassword} = req.body;
-  
-  if(!oldPassword && !newPassword){
-    throw new ApiError(404, "new or old password is requires !")
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword && !newPassword) {
+    throw new ApiError(404, "new or old password is requires !");
   }
-  // step 2 - find the user 
-  const user  = await User.findById(req.verifyToken?._id)
-  
+  // step 2 - find the user
+  const user = await User.findById(req.verifyToken?._id);
+
   // step 3 - check the old password is correct or not :
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
-  
-   if(!isPasswordCorrect){
-     throw new ApiError(404, "Old password is not match !")
-    }
-    
-    // step 4 - update database;
-    user.password = newPassword;
-    await user.save( {validateBeforeSave : false} );
 
+  if (!isPasswordCorrect) {
+    throw new ApiError(404, "Old password is not match !");
+  }
 
-    return res
+  // step 4 - update database;
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
     .status(200)
-    .json(
-      new ApiResponse(200,
-         {},
-        "Password change successfully..")
-    )
+    .json(new ApiResponse(200, {}, "Password change successfully.."));
+});
 
-    
+// Update Avatar from User :
 
+const Update_Avatar = asyncHandler(async (req, res) => {
+  // step 1 : get Avatar from user;
+  // step 2 : check is avatar is get or not ?:
+  // step 3 - find the user ;
+  //  step 4 : auger avatar get hui h new to usko save  kardo  db me or clodinary per bej do;
 
-})
+  // ////
 
+  // step 1 : get Avatar from user;
 
-// Update Avatar from User : 
+  const localFilePath = req.file?.path;
 
-const Update_Avatar = asyncHandler( async (req,res) => {
-    // step 1 : get Avatar from user;
-    // step 2 : check is avatar is get or not ?:
-    // step 3 - find the user ;
-    //  step 4 : auger avatar get hui h new to usko save  kardo  db me or clodinary per bej do;
-    
-    // ////
+  if (!localFilePath) {
+    throw new ApiError(502, "File not change");
+  }
 
-    // step 1 : get Avatar from user;
+  // const user  = await User.findById(req.verifyToken?._id)
+  const avatar = await uploadOnCloudinary(localFilePath);
+  if (!avatar.url) {
+    throw new ApiError(505, "avatar file not uploded");
+  }
 
-    const localFilePath = req.file?.path;
+  //  console.log("AUTH USER : ", req.verifyToken );
+  //  console.log("unAUTH USER : ", req.user );
 
-    if(!localFilePath){
-      throw new ApiError(502,"File not change")
-    };
-
-    // const user  = await User.findById(req.verifyToken?._id)
-    const avatar = await uploadOnCloudinary(localFilePath);
-    if(!avatar.url){
-      throw new ApiError(505, "avatar file not uploded")
-    }
-    
-  const user   =   await User.findByIdAndUpdate(
-    req.verifyToken?._id, 
+  const user = await User.findByIdAndUpdate(
+    req.verifyToken?._id,
     {
-      $set:{
-          avatar : avatar.url 
-      }
-    }, 
+      $set: {
+        avatar: avatar.url,
+      },
+    },
     {
-      new : true
-    }
-  )
+      new: true,
+    },
+  );
 
-
-    return res
-    .status(200)
-    .json(
-       new  ApiResponse(200, user, "Avatar Update!"));
-              
+  return res.status(200).json(new ApiResponse(200, user, "Avatar Update!"));
 });
 
 
+const getUserChannelProfile = asyncHandler(async(req,res) =>{
+      // here we are get the user profile like when we open our/user profile to uske under apnko kya kya fields dhikni chaiye like subsribers kiten use user ke , ya fir usne kitno ko subsribedTo kar rakha h ya or avatar usrname etc etc..
+    
+
+     // step 1: get the user from params
+     const {username} = res.params;
+
+     if(!username?.trim()){
+      throw new ApiError(400, 'Username is missing')
+     }
 
 
+    //  step 2: aggregation pipeline 
+
+   const channel = await User.aggregate([
+      // step i : find the this user form db by username/filter the doc
+       {
+        $match : {
+              username: username?.toLowerCase()
+        }
+       },
+
+       // step ii : how many subscriber of this user 
+       {
+           
+        $lookup : {
+          from : "subscriptions",
+          localField : "_id",
+          foreignField : "channel",
+          as : "subscribers"
+
+        }
+
+       },
+
+      //  step iii : how many subscribed by the use / user ne kitne logo ko subsribed kiya h 
+
+       {
+           
+        $lookup : {
+          from : "subscriptions",
+          localField : "_id",
+          foreignField : "subscriber",
+          as : "subscribedTo" //subscribed
+
+        }
+
+       },
+   
+      //  step iv: ab hum subsribers or subscribed ko count kar reh h or ye jo fields h like subscribed or subsribers unko user MODEL me daal rhe h 
+       {
+            $addFields : {
+              subscribereCount  : {
+                $size : "$subscribers"
+              },
+
+              channelsSubscribedToCount : {
+                $size : "$subscribedTo"
+              },
+            //  step v : ye bata  h ki kya jo user h usko humne follow kiya h ya fir jo user ki profile humne open ki h usko humne follow kiya h
+              isSubscribed : {
+                $cond : {
+                  if : {$in: [req.user?._id,"$subscribers.subscriber"]},
+                  then : true,
+                  else : false
+                }
+              }
+            }
+
+       },
+
+       {
+        $project : {
+          username : 1,
+          avatar : 1,
+          fullName : 1,
+          subscribereCount : 1,
+          channelsSubscribedToCount : 1,
+          email : 1,
+          coverImage : 1
+
+        }
+       }
+   
 
 
+   ]);
 
-export { registerUser, LoggedInUser,LoggoutUser,Change_Password,Update_Avatar};
+ console.log( "CHANNEL : ",channel);
+
+  if(!channel?.length){
+    throw new ApiError(404, "Channel does not exists!")
+  }
+  
+  return res
+  .status(200)
+  .json(
+    new ApiResponse(200,chennel[0], "User channel fetched Successfully !")
+  )
+});
+
+export {
+  registerUser,
+  LoggedInUser,
+  LoggoutUser,
+  Change_Password,
+  Update_Avatar,
+  getUserChannelProfile
+};
