@@ -323,11 +323,11 @@ const Update_Avatar = asyncHandler(async (req, res) => {
 
 
 const getUserChannelProfile = asyncHandler(async(req,res) =>{
-      // here we are get the user profile like when we open our/user profile to uske under apnko kya kya fields dhikni chaiye like subsribers kiten use user ke , ya fir usne kitno ko subsribedTo kar rakha h ya or avatar usrname etc etc..
+  // here we are get the user profile like when we open our/user profile to uske under apnko kya kya fields dhikni chaiye like subsribers kiten use user ke , ya fir usne kitno ko subsribedTo kar rakha h ya or avatar usrname etc etc..
     
 
      // step 1: get the user from params
-     const {username} = res.params;
+     const {username} = req.params;
 
      if(!username?.trim()){
       throw new ApiError(400, 'Username is missing')
@@ -337,14 +337,14 @@ const getUserChannelProfile = asyncHandler(async(req,res) =>{
     //  step 2: aggregation pipeline 
 
    const channel = await User.aggregate([
-      // step i : find the this user form db by username/filter the doc
+      // step i : find  this user from db by username/filter the doc
        {
         $match : {
               username: username?.toLowerCase()
         }
        },
 
-       // step ii : how many subscriber of this user 
+       // step ii : lookup -> how to join subscribers or users /find who subscribe me 
        {
            
         $lookup : {
@@ -381,7 +381,7 @@ const getUserChannelProfile = asyncHandler(async(req,res) =>{
               channelsSubscribedToCount : {
                 $size : "$subscribedTo"
               },
-            //  step v : ye bata  h ki kya jo user h usko humne follow kiya h ya fir jo user ki profile humne open ki h usko humne follow kiya h
+            //  step v : ye batata  h ki kya jo user h usko humne follow kiya h ya fir jo user ki profile humne open ki h usko humne follow kiya h..? (advanced topic learn later more)
               isSubscribed : {
                 $cond : {
                   if : {$in: [req.user?._id,"$subscribers.subscriber"]},
@@ -393,6 +393,7 @@ const getUserChannelProfile = asyncHandler(async(req,res) =>{
 
        },
 
+      // step v : only selected fileds hi res send ho 
        {
         $project : {
           username : 1,
@@ -405,8 +406,6 @@ const getUserChannelProfile = asyncHandler(async(req,res) =>{
 
         }
        }
-   
-
 
    ]);
 
@@ -419,7 +418,7 @@ const getUserChannelProfile = asyncHandler(async(req,res) =>{
   return res
   .status(200)
   .json(
-    new ApiResponse(200,chennel[0], "User channel fetched Successfully !")
+    new ApiResponse(200,channel[0], "User channel fetched Successfully !")
   )
 });
 
