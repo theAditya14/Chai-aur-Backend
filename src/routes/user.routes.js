@@ -5,7 +5,8 @@ import {
     LoggoutUser,
     Change_Password,
     Update_Avatar,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 
 } from "../controllers/user.controller.js";
 import upload from '../middlewares/multer.js' 
@@ -40,5 +41,7 @@ router.route("/logout").post(verifyJWT,LoggoutUser)
 router.route("/changePassword").post(verifyJWT,Change_Password)
 router.route("/updateAvatar").patch(verifyJWT, upload.single("avatar"),Update_Avatar)
 router.route("/profile/:username").get(verifyJWT, getUserChannelProfile)
+
+router.route("history").get(verifyJWT,getWatchHistory )
 
 export { router }; 
