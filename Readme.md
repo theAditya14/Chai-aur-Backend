@@ -70,6 +70,23 @@ Login System .
 <img width="965" height="791" alt="Screenshot 2026-09-21 161204" src="https://github.com/user-attachments/assets/e21f7f91-13cd-408d-a188-e871211ec0ca" />
 
 
- 
+ FUNCTION toggleSubscription:
+  Get channelId from request URL
+   Get logged-in user's ID from JWT
+    ↓
+     subscriberId = req.user._id
+      Check:
+       Does subscription exist where:
+        subscriber = subscriberId 
+        AND
+         channel = channelId 
+         IF subscription exists:
+          Delete that subscription 
+          Return: "Unsubscribed successfully"
+           ELSE:
+            Create new subscription: 
+            subscriber = subscriberId
+             channel = channelId 
+             Return: "Subscribed successfully"
 
     
