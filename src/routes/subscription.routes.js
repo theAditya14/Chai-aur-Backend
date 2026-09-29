@@ -1,12 +1,14 @@
-import { Router } from "express";
-import verifyJWT from "../middlewares/auth.middlewares";
+import { Router } from "express"
+import verifyJWT from "../middlewares/auth.middlewares.js"
+
+import {toggleSubscription} from "../controllers/subscription.controller.js"
 
 
 
 
-const router = Router();
-router.use(verifyJWT)
+const subscription = Router();
+subscription.use(verifyJWT)
 
-router.route("/subscribe/:channelId").post(toggleSubscription)
+subscription.route("/subscriber/:channelId").post(toggleSubscription)
 
-export {router}
+export { subscription }

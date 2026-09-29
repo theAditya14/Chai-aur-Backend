@@ -1,8 +1,10 @@
-import { Subscription } from "../models/subsription.model";
-import ApiError from "../utils/apiError";
-import { asyncHandler } from "../utils/asyncHandler";
+import  Subscription  from "../models/subsription.model.js";
+import ApiError from "../utils/apiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import ApiResponse from "../utils/apiResponse.js";
 
 
+// subscribe and unsubscribe to a channel
 
 const toggleSubscription = asyncHandler(async(req,res) =>{
     // 1: get channel detail like username or other,
@@ -12,7 +14,9 @@ const toggleSubscription = asyncHandler(async(req,res) =>{
     // 5: return the response with the updated subscription status
 
     const { channelId } = req.params;
-    const userId = req.user.id
+    console.log(channelId);
+    const userId = req.verifyToken.id
+    console.log(userId);
 
   
     if(userId.toString() === channelId){
@@ -56,6 +60,11 @@ const toggleSubscription = asyncHandler(async(req,res) =>{
 
 
 })
+
+
+
+
+
 
 
 
