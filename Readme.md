@@ -69,6 +69,32 @@ Login System .
 
 <img width="965" height="791" alt="Screenshot 2026-09-21 161204" src="https://github.com/user-attachments/assets/e21f7f91-13cd-408d-a188-e871211ec0ca" />
 
+----------------------------------------
+
+How subscribe a User to another User/Channel .
+
+FUNCTION toggleSubscription: 
+1 : Get channelId from request URL 
+2 : Get logged-in user's ID from JWT
+            ↓ 
+3 : subscriberId = req.user._id 
+4 : Check:
+      Does subscription exist where
+      subscriber = subscriberId
+      AND 
+      channel = channelId 
+5 :    IF subscription exists:
+6 :      Delete that subscription Return
+7  : "Unsubscribed successfully" 
+      ELSE
+  8    : Create new subscription
+   9   : subscriber = subscriberId
+    10:   channel = channelId 
+      11 : Return: "Subscribed successfully"
+
+
+<img width="1202" height="462" alt="image" src="https://github.com/user-attachments/assets/385ea153-91e3-40ee-b189-e323e2ded1f6" />
+
 
  
 
