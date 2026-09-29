@@ -430,7 +430,7 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
 
       {
         $match : {
-          _id : new mongoose.Types.ObjectId(req.user._id);
+          _id : new mongoose.Types.ObjectId(req.user._id)
         }
       },
 
@@ -443,7 +443,7 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
           as: 'watchHistory',
 
           pipeline : [
-            // for users 
+            // for ower of videos
             {
               $lookup : {
                 form : "users",

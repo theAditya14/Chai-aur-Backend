@@ -20,9 +20,11 @@ app.use(cookieParser())
 
 // routes import  segrigation of files
 import {router} from '../src/routes/user.routes.js';
+import {subscription} from '../src/routes/subscription.routes.js'
 
 //routes declaration
 app.use('/api/v1/users', router)
+app.use('/api/v1/subscrib', subscription)
 
 
 export default app  
