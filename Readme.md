@@ -71,22 +71,30 @@ Login System .
 
 
  FUNCTION toggleSubscription:
+
   Get channelId from request URL
    Get logged-in user's ID from JWT
     ↓
-     subscriberId = req.user._id
-      Check:
-       Does subscription exist where:
-        subscriber = subscriberId 
-        AND
-         channel = channelId 
-         IF subscription exists:
-          Delete that subscription 
-          Return: "Unsubscribed successfully"
-           ELSE:
-            Create new subscription: 
-            subscriber = subscriberId
-             channel = channelId 
-             Return: "Subscribed successfully"
+    subscriberId = req.user._id
+     Check:
+      Does subscription exist where:
+       subscriber = subscriberId 
+       AND
+        channel = channelId 
+        IF subscription exists:
+         Delete that subscription 
+         Return: "Unsubscribed successfully"
+          ELSE:
+           Create new subscription: 
+           subscriber = subscriberId
+          channel = channelId 
+          Return: "Subscribed successfully"
 
     
+<!-- GET All Subscribers of Channel -->
+
+  // step 1:  Get channel ID 
+  // step 2: Check channelId
+  // step 3: Check channel/user exists ?
+  // step 4:  Find all subscribers
+   // 5. Send response

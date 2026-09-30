@@ -2,6 +2,8 @@ import  Subscription  from "../models/subsription.model.js";
 import ApiError from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/apiResponse.js";
+import User from "../models/user.model.js";
+import { subscribe } from "diagnostics_channel";
 
 
 // subscribe and unsubscribe to a channel
@@ -65,9 +67,62 @@ const toggleSubscription = asyncHandler(async(req,res) =>{
 
 
 
+// get all subscribers of a channel;
+
+const getAllSubscribers = asyncHandler(async(req,res) =>{
+
+  // step 1:  Get channel ID 
+  // step 2: Check channelId
+  // step 3: Check channel/user exists ?
+  // step 4:  Find all subscribers
+   // 5. Send response
+
+
+   
+  const {channelId} = req.params
+  
+
+
+  if(!channelId){
+    throw new ApiError(404, "Channelid is required")
+  }
+
+  const channel = await User.findById(channelId)
+
+
+  if(!channel){
+    throw new ApiError(405, "channel is not found")
+  }
+
+  // find all subscribers
+ const subscribers  =  await Subscription.find({
+    channel :channelId    
+  }).populate(
+    "subscriber",
+    "username fullname avatart"
+  )
+
+
+
+  // 5. Send response
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            subscribers,
+            "All subscribers fetched successfully"
+        )
+    );
+
+
+
+  
+
+});
+
 
 
 
 export {
-  toggleSubscription
+  toggleSubscription,
+  getAllSubscribers
 }
