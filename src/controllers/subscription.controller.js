@@ -85,12 +85,42 @@ const getAllSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-  // 1 : get user Id who logged in 
+  // 1 : get user/channel Id who logged in 
   // 2 : check user id 
   // 3 : channel or user exist ?
-  // 4 :
+  // 4 : find the subscribed channels of the user
+
   const { subscriberId } = req.params;
+  console.log(subscriberId)
+
+  if(!subscriberId){
+    console.log("Subscriber ID is required");
+    throw new ApiError(505,"user id is required")
+  }
+  
+ const existsubscribed = await User.findById(subscriberId);
+
+ if(!existsubscribed){
+  throw new ApiError(500, "user is not found")
+ }
+
+const subscribedTo = await Subscription.find({
+  subscriber:subscriberId
+}).populate("channel","username avatar fullName")
+
+console.log(subscribedTo)
+
+return res.status(200).json(new ApiResponse(200,subscribedTo,"subscribed channels fetched successfully"))
+
+
+
+
 
 });
 
-export { toggleSubscription, getAllSubscribers };
+
+
+
+
+
+export { toggleSubscription, getAllSubscribers ,getSubscribedChannels};
