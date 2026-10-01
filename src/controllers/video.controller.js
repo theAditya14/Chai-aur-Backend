@@ -1,8 +1,9 @@
-import { Video } from "../models/video";
-import ApiError from "../utils/apiError";
-import ApiResponse from "../utils/apiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
-import uploadOnCloudinary from "../utils/cloudnary";
+import {Video}  from "../models/video.model.js";
+import ApiError from "../utils/apiError.js";
+import ApiResponse from "../utils/apiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import uploadOnCloudinary from "../utils/cloudnary.js";
+import verifyJWT from "../middlewares/auth.middlewares.js"
 
 
 const UploadVideos = asyncHandler(async(req,res) =>{
@@ -16,30 +17,47 @@ if(!title){
 }
 
 // 2 : check for video
-const videoFile = req.files?.videoFile?.[0]?.path;
+const localvideoFile = req.files['videoFile'][0]?.path;
+const localthumbnail = req.files['thumbnail'][0]?.path;
 
-console.log(video)
+console.log( "local File path : ",localvideoFile)
+
+console.log( "local File path : ", localthumbnail)
  
-if(!videoFile){
+if(!localvideoFile){
     throw new ApiError(404, "video is required")
 }
+if(!localthumbnail){
+    throw new ApiError(404, "video thumbnail is required")
+}
 
-const video = await uploadOnCloudinary(videoFile);
+const video = await uploadOnCloudinary(localvideoFile);
+const thumbnail = await uploadOnCloudinary(localthumbnail);
 
 if(!video){
     throw new ApiError(404, "Video file upload failed! ")
 }
 
+if(!thumbnail){
+    throw new ApiError(404, " thumbnail file upload failed! ")
+}
+
 const videoCreate = await Video.create({
     title,
     description,
-    video : video.url,
+    videoFile : video.url,
+    thumbnail : thumbnail.url
    
-
 })
 
 await videoCreate.save();
+console.log("Video Upload : ",videoCreate)
 
-return res.status(200).json( new ApiResponse( 200, videoCreate, "Video upload successfully"))
+ return  res
+.status(200)
+.json( new ApiResponse( 200, videoCreate, "Video upload successfully"))
 
 } );
+
+
+export {UploadVideos}
