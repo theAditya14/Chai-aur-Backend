@@ -4,6 +4,7 @@ import ApiResponse from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import uploadOnCloudinary from "../utils/cloudnary.js";
 import verifyJWT from "../middlewares/auth.middlewares.js"
+import User from "../models/user.model.js";
 
 
 const UploadVideos = asyncHandler(async(req,res) =>{
@@ -11,14 +12,21 @@ const UploadVideos = asyncHandler(async(req,res) =>{
 //  1: get data from user 
 
 const {title, description} = req.body;
+const userId = req.verifyToken?.id
+
+if(!userId){
+    throw new ApiError(400, "unauthorized user")
+}
+
+
 
 if(!title){
     throw new ApiError(400,"Video title required")
 }
 
 // 2 : check for video
-const localvideoFile = req.files['videoFile'][0]?.path;
-const localthumbnail = req.files['thumbnail'][0]?.path;
+const localvideoFile = req.files.videoFile?.[0]?.path;
+const localthumbnail = req.files.thumbnail?.[0]?.path;
 
 console.log( "local File path : ",localvideoFile)
 
@@ -40,9 +48,11 @@ if(!video){
 
 if(!thumbnail){
     throw new ApiError(404, " thumbnail file upload failed! ")
+
 }
 
 const videoCreate = await Video.create({
+    owner : userId,
     title,
     description,
     videoFile : video.url,
@@ -50,7 +60,6 @@ const videoCreate = await Video.create({
    
 })
 
-await videoCreate.save();
 console.log("Video Upload : ",videoCreate)
 
  return  res
@@ -58,18 +67,35 @@ console.log("Video Upload : ",videoCreate)
 .json( new ApiResponse( 200, videoCreate, "Video upload successfully"))
 
 
-// what the problem is 
-// 1 : auth , every one upload video
-// 2 : user or video relation 
+
 } );
 
 
-// get all videos 
-const getAllVideos = asyncHandler(async(req,res) =>{
-        const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+// get video
+const getVideo = asyncHandler(async(req,res) =>{
+        // const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+
+        const {videoId} = req.params;
+        
+        if(!videoId){
+            throw new ApiError(400, 'video id is required')
+        }
+
+      const video =   await Video.findById(videoId).populate("owner", "username avatar fullName  ")
+
+
+        console.log(video);
+
+     return res.status(200).json( new ApiResponse(200, video, "Video fetch successfully! "))
+        
+
+      
 })
 
+// get all Videos 
 
 
 
-export {UploadVideos}
+
+
+export {UploadVideos,getVideo}
