@@ -1,7 +1,7 @@
 import {Router}  from "express";
 import upload from '../middlewares/multer.js' 
 import verifyJWT from "../middlewares/auth.middlewares.js";
-import { getVideo, UploadVideos } from "../controllers/video.controller.js";
+import { getVideo, UploadVideos,getAllVideos } from "../controllers/video.controller.js";
 
 
 
@@ -18,6 +18,7 @@ videoRouter.route("/uploade-video").post(
 verifyJWT, UploadVideos)
 
 videoRouter.route("/getVideo/:videoId").get(verifyJWT,getVideo)
+videoRouter.route("/getAllVideo/:userId").get(verifyJWT,getAllVideos)
 
 
 export {videoRouter}
