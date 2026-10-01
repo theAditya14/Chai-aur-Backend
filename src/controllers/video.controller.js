@@ -57,7 +57,19 @@ console.log("Video Upload : ",videoCreate)
 .status(200)
 .json( new ApiResponse( 200, videoCreate, "Video upload successfully"))
 
+
+// what the problem is 
+// 1 : auth , every one upload video
+// 2 : user or video relation 
 } );
+
+
+// get all videos 
+const getAllVideos = asyncHandler(async(req,res) =>{
+        const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+})
+
+
 
 
 export {UploadVideos}
