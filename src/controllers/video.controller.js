@@ -64,7 +64,7 @@ const UploadVideos = asyncHandler(async (req, res) => {
 
 // get video
 const getVideo = asyncHandler(async (req, res) => {
-  // const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+
 
   const { videoId } = req.params;
 
@@ -120,4 +120,48 @@ const getAllVideos = asyncHandler(async (req, res) => {
         );
 });
 
-export { UploadVideos, getVideo, getAllVideos };
+
+const togglePublishStatus = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    const user = req.verifyToken?._id
+    
+
+    if(!videoId){
+      throw new ApiError(401, "video Id is required")
+    }
+
+
+    if(!user){
+      throw new ApiError(400, "user unauthorized ")
+    }
+
+    const video =  await Video.findById(videoId);
+   
+    
+
+    if(!video){
+      throw new ApiError(404, "video is not avelabile")
+    }
+
+    if(user.toString() !== video.owner.toString()){
+  console.log(video.owner);
+  console.log( "vefiy user ",user)
+      throw new ApiError(404, "unauthorized illegal activity !")
+    }
+    
+    video.isPublished = !video.isPublished;
+
+    await video.save();
+
+    return res
+    .status(200).json(new ApiResponse(200, video ,"toggle update successfully" ))
+
+
+   
+
+
+})
+
+
+
+export { UploadVideos, getVideo, getAllVideos,togglePublishStatus };
