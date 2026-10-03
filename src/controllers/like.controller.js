@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import { like } from "../models/like.model.js";
 import { Video } from "../models/video.model.js";
 import ApiError from "../utils/apiError.js";
+import ApiResponse from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 
@@ -16,56 +18,87 @@ const likeByUsers  = asyncHandler( async(req,res) =>{
         // ii : join like/video/user 
 
 
-    const user = req.verifyToken._id
+    const likeBy = req.verifyToken._id
     const {videoId} = req.params;
 
-    if(!user){
+    if(!likeBy){
         throw new ApiError(404, "user id is required")
     }
     if(!videoId){
         throw new ApiError(404, "video id is required")
     }
 
-//    const video =  await  Video.findById(videoId);
+   const video =  await  Video.findById(videoId);
+
+   if(!video){
+    throw new ApiError(400,"vodeo not found")
+   }
+
+ const existLike =   await like.findOne({
+    likeBy,
+    video : videoId
+
+   })
 
 
-    const likeVideo = await like.aggregate([
+   if(existLike){
+     await like.findByIdAndDelete(existLike._id)
+     return res
+     .status(200)
+     .json( new ApiResponse(200, {}, "Remove video like"))
 
-        {
-           $lookup : {
-            from : "videos",
-            localField : "video",
-            foreignField : "_id",
-            as : "like"
-           }          
-        },
+   } else{
+     const newLike = await like.create({likeBy, video : videoId})
+    //   console.log(newLike);
+    
+     return res
+     .status(200)
+     .json( new ApiResponse(200 , newLike ,"like successfully" ))
+   }
 
-
-        {
-            $addFields : {
-                likeCount : {
-                    $size : "$like"
-                }
-            }
-        },
-
-         {
-            $project : {
-                videoFiled : 1,
-                title : 1,
-
-
-            }
-         }
-
-
-
-    ])
-
-
-console.log(likeVideo)
 
 
 })
 
-export {likeByUsers}
+
+
+const getAllLiked  = asyncHandler(async(req,res) =>{
+ const {videoId} = req.params;
+  
+ if(!videoId){
+    throw new ApiError(400,"video id is required")
+ }
+
+ const getVideoAllLike = await like.findById(videoId);
+
+ if(!getVideoAllLike) {
+    throw new ApiError(400, "video is founded")
+ }
+
+ const AllLiked = await like.aggregate([
+    {
+        $match : {
+            _id : new mongoose.Types.ObjectId(videoId)
+        }
+    },
+
+    {
+        $lookup : {
+               from : "videos",
+               localField : "video",
+               foreignField : "_id",
+               as : "AllLike"
+        }
+        
+    }
+ ])
+
+ 
+
+
+})
+
+
+
+
+export {likeByUsers,getAllLiked}
