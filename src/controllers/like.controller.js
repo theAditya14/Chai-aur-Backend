@@ -4,9 +4,10 @@ import { Video } from "../models/video.model.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { comments } from "../models/comments.model.js";
 
 
-
+///  toggle like on video
 const likeByUsers  = asyncHandler( async(req,res) =>{
 
 
@@ -53,7 +54,7 @@ const likeByUsers  = asyncHandler( async(req,res) =>{
 })
 
 
-
+// get all likes on videos;
 const getAllLiked  = asyncHandler(async(req,res) =>{
  const {videoId} = req.params;
   // console.log(videoId);
@@ -78,6 +79,51 @@ return res
 })
 
 
+//  toggle like on comment
+const toggleCommentLike = asyncHandler(async (req, res) => {
+    const {commentId} = req.params
+    const user = req.verifyToken._id
+
+    if(!commentId){
+      throw new ApiError(400, "comment id is required")
+    }
+    if(!user){
+      throw new ApiError(400, "user id is required")
+    }
 
 
-export {likeByUsers,getAllLiked}
+    const comment = await comments.findById(commentId)
+    
+    const exisitinCommentLike = await like.findOne({
+          likeBy : user,
+          comments : commentId
+    })
+
+
+    if(exisitinCommentLike){
+       await like.findByIdAndDelete(exisitinCommentLike._id)
+       return res
+       .status(200).json( new ApiResponse(200, [], "like on comment is remove"))
+
+    } else {
+     const commentLike =  await like.create({
+        likeBy : user,
+        comments : commentId
+      })
+
+      return res
+      .status(200).json( new ApiResponse(200, commentLike, " like successfuly of comment"))
+    }
+
+
+
+
+
+
+})
+
+
+
+
+
+export {likeByUsers,getAllLiked,toggleCommentLike}

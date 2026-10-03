@@ -10,6 +10,7 @@ like.use(verifyJWT)
 
 like.route("/video-like/:videoId").post(likeByUsers)
 like.route("/video-AllLike/:videoId").get(getAllLiked)
+like.route("/video-like-on-comment/:commentId").get(getAllLiked)
 
 
 export {like}
