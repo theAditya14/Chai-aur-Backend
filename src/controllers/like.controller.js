@@ -7,15 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 
-
-
-
 const likeByUsers  = asyncHandler( async(req,res) =>{
-
-    //  1 : get user id or video id 
-    //  2 : aggregation pipeline
-        //  i : find user / video 
-        // ii : join like/video/user 
 
 
     const likeBy = req.verifyToken._id
@@ -64,22 +56,20 @@ const likeByUsers  = asyncHandler( async(req,res) =>{
 
 const getAllLiked  = asyncHandler(async(req,res) =>{
  const {videoId} = req.params;
-  console.log(videoId);
+  // console.log(videoId);
   
  if(!videoId){
     throw new ApiError(400,"video id is required")
  }
 
-//  const getVideoAllLike = await like.findOne({video: videoId} );
+  const totlelike =  await like.countDocuments({video : videoId})
+  
+  const Users = await like.find({video : videoId}).populate("likeBy", "username  avatar fullName")
+  console.log(Users)
 
-
-
-//  if(!getVideoAllLike) {
-//     throw new ApiError(400, "video is founded")
-//  }
-
-  const totlelike =  await like.countDocuments(videoId)
-console.log(totlelike)
+return res
+.status(200)
+.json( new ApiResponse(200,[totlelike ,Users], "All Likes are fetch successfully! "))
 
  
 
