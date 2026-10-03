@@ -9,11 +9,12 @@ const commentSchema = new Schema(
         },
 
         video : {
-
-            ref : "Video"
+         type : Schema.Types.ObjectId,
+        ref : "Video"
         },
 
          owner : {
+                type : Schema.Types.ObjectId,
                 ref : "User"
          }
         

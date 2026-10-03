@@ -123,6 +123,12 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 })
 
 
+//get all likes on comment;
+// later todo 
+
+
+
+
 
 
 
