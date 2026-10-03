@@ -5,7 +5,24 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 
 
 
+const getVideoComments = asyncHandler(async (req, res) => {
+    //TODO: get all comments for a video
+    const {videoId} = req.params
+    // const {page = 1, limit = 10} = req.query
 
+    if(!videoId){
+        throw new ApiError(400, "video id is required")
+    }
+
+    const allComments = await comments.find({video : videoId}).populate("owner", "username , fullName, avatar")
+    // console.log(allcomments)
+    const commentCount = await comments.countDocuments({video : videoId})
+
+    return res 
+    .status(200)
+    .json(new ApiResponse(200, [allComments ,commentCount], "COMMENTS ARE"))
+
+})
 
 
 // TODO: add a comment to a video
@@ -62,8 +79,6 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 
-
-
 //Update comment i don't think it is important because user can delete there comment and add new 
 const updateComment = asyncHandler(async (req, res) => {
     // TODO: update a comment
@@ -94,4 +109,4 @@ const deleteComment = asyncHandler(async (req, res) => {
 })
 
 
-export {addComment,updateComment,deleteComment}
+export {addComment,updateComment,deleteComment,getVideoComments}
