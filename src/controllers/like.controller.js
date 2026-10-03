@@ -64,36 +64,25 @@ const likeByUsers  = asyncHandler( async(req,res) =>{
 
 const getAllLiked  = asyncHandler(async(req,res) =>{
  const {videoId} = req.params;
+  console.log(videoId);
   
  if(!videoId){
     throw new ApiError(400,"video id is required")
  }
 
- const getVideoAllLike = await like.findById(videoId);
+//  const getVideoAllLike = await like.findOne({video: videoId} );
 
- if(!getVideoAllLike) {
-    throw new ApiError(400, "video is founded")
- }
 
- const AllLiked = await like.aggregate([
-    {
-        $match : {
-            _id : new mongoose.Types.ObjectId(videoId)
-        }
-    },
 
-    {
-        $lookup : {
-               from : "videos",
-               localField : "video",
-               foreignField : "_id",
-               as : "AllLike"
-        }
-        
-    }
- ])
+//  if(!getVideoAllLike) {
+//     throw new ApiError(400, "video is founded")
+//  }
+
+  const totlelike =  await like.countDocuments(videoId)
+console.log(totlelike)
 
  
+
 
 
 })
