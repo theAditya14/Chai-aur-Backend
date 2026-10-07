@@ -44,373 +44,910 @@ I know I still have a lot to learn, but I am enjoying the process and trying to 
 
 🚀 **This is just the beginning of my Backend Development Journey.**
 
+# 🎬 YouTube Backend API
 
-🎬 YouTube Backend API Documentation
+> A RESTful backend API for a YouTube-like video platform built with **Node.js, Express.js, MongoDB, JWT, Cloudinary, and Mongoose**.
 
-This backend provides REST APIs for a YouTube-like video platform. It supports user authentication, video management, subscriptions, likes, and comments.
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green?logo=node.js\&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-black?logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Database-green?logo=mongodb\&logoColor=white)](https://www.mongodb.com/)
+[![Mongoose](https://img.shields.io/badge/Mongoose-ODM-red?logo=mongoose\&logoColor=white)](https://mongoosejs.com/)
+[![JWT](https://img.shields.io/badge/JWT-Authentication-black?logo=jsonwebtokens)](https://jwt.io/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Media%20Storage-blue?logo=cloudinary\&logoColor=white)](https://cloudinary.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](#-license)
 
-Base URL:
+---
 
-YOUR_BASE_URL/api/v1
+## 📌 Overview
 
-Example:
+This project is a backend implementation of a **YouTube-like video platform**.
 
-https://your-domain.com/api/v1
-📌 API Structure
-/api/v1
+The API provides functionality for:
+
+* 👤 User authentication
+* 🔐 JWT-based authorization
+* 🎥 Video upload and management
+* ☁️ Cloudinary media storage
+* 👥 Channel subscriptions
+* ❤️ Video and comment likes
+* 💬 Comments
+* 🕘 Watch history
+* 👤 User profiles
+* 🔄 Publish / unpublish videos
+* 🔑 Password management
+
+The project is designed as a **REST API**, so a frontend, mobile application, Postman, or another service can communicate with it through HTTP requests.
+
+---
+
+# ✨ Features
+
+### 👤 Authentication & Users
+
+* User login and logout
+* Protected routes
+* Password change
+* Profile management
+* Avatar upload
+* User profile lookup
+* Watch history
+
+### 🎥 Video Management
+
+* Upload videos
+* Upload thumbnails
+* Store media using Cloudinary
+* Retrieve individual videos
+* Retrieve videos uploaded by a user
+* Publish / unpublish videos
+
+### 👥 Subscriptions
+
+* Subscribe / unsubscribe to channels
+* Get channel subscribers
+* Get channels subscribed to by a user
+
+### ❤️ Likes
+
+* Like / unlike videos
+* Get video likes
+* Like / unlike comments
+
+### 💬 Comments
+
+* Add comments to videos
+* Delete comments
+
+---
+
+# 🏗️ Architecture
+
+```text
+                         ┌─────────────────────┐
+                         │      CLIENT         │
+                         │                     │
+                         │ Web / Mobile /      │
+                         │ Postman / Frontend  │
+                         └──────────┬──────────┘
+                                    │
+                                    │ HTTP Requests
+                                    ▼
+                         ┌─────────────────────┐
+                         │     EXPRESS.JS      │
+                         │      SERVER         │
+                         └──────────┬──────────┘
+                                    │
+                  ┌─────────────────┼─────────────────┐
+                  │                 │                 │
+                  ▼                 ▼                 ▼
+          ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+          │   Routes     │  │ Middleware   │  │ Controllers  │
+          │              │  │              │  │              │
+          │ Users        │  │ JWT Auth     │  │ Business     │
+          │ Videos       │  │ Error Handle │  │ Logic        │
+          │ Likes        │  │ Validation   │  │              │
+          │ Comments     │  │              │  │              │
+          │ Subscription │  │              │  │              │
+          └──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+                 │                 │                 │
+                 └─────────────────┼─────────────────┘
+                                   │
+                                   ▼
+                         ┌─────────────────────┐
+                         │      MONGOOSE       │
+                         │       ODM           │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │      MONGODB        │
+                         │      Database       │
+                         └─────────────────────┘
+
+                         ┌─────────────────────┐
+                         │     CLOUDINARY      │
+                         │                     │
+                         │ Videos / Images     │
+                         └─────────────────────┘
+```
+
+---
+
+# 🛠️ Tech Stack
+
+| Technology        | Purpose               |
+| ----------------- | --------------------- |
+| **Node.js**       | JavaScript runtime    |
+| **Express.js**    | Backend web framework |
+| **MongoDB**       | Database              |
+| **Mongoose**      | MongoDB ODM           |
+| **JWT**           | Authentication        |
+| **bcrypt**        | Password hashing      |
+| **Cloudinary**    | Video & image storage |
+| **Multer**        | File upload handling  |
+| **CORS**          | Cross-origin requests |
+| **Cookie Parser** | Cookie handling       |
+| **Morgan**        | HTTP request logging  |
+
+---
+
+# 📂 Project Structure
+
+```text
+BACKEND/
 │
-├── users
-│   ├── Authentication
-│   ├── Profile
-│   └── History
+├── src/
+│   │
+│   ├── controllers/
+│   │
+│   ├── db/
+│   │   └── index.js
+│   │
+│   ├── middlewares/
+│   │
+│   ├── models/
+│   │
+│   ├── routes/
+│   │
+│   ├── utils/
+│   │
+│   ├── app.js
+│   └── index.js
 │
-├── videoRouter
-│   ├── Upload Video
-│   ├── Get Videos
-│   └── Publish/Unpublish
+├── Public/
 │
-├── subscription
-│   ├── Subscribe / Unsubscribe
-│   ├── Channel Subscribers
-│   └── Subscribed Channels
-│
-├── like
-│   ├── Video Likes
-│   └── Comment Likes
-│
-└── comments
-    ├── Add Comment
-    └── Delete Comment
-👤 1. User APIs
+├── .env
+├── .gitignore
+├── package.json
+└── README.md
+```
 
-User APIs handle authentication, profile management, password changes and watch history.
+> The exact folder structure may vary depending on the current implementation.
 
-🔐 Login
+---
 
-POST
+# ⚙️ Installation
 
-/api/v1/users/login
+## 1. Clone the repository
 
-Logs an existing user into the application and creates the required authentication session/token.
+```bash
+git clone YOUR_GITHUB_REPOSITORY_URL
+```
 
-Example:
+## 2. Navigate to the project
 
+```bash
+cd BACKEND
+```
+
+## 3. Install dependencies
+
+```bash
+npm install
+```
+
+## 4. Create `.env`
+
+Create a `.env` file in the root directory:
+
+```env
+PORT=8000
+
+MONGODB_URL=your_mongodb_connection_string
+DB_NAME=your_database_name
+
+CORS_ORIGIN=http://localhost:3000
+
+ACCESS_TOKEN_SECRET=your_access_token_secret
+ACCESS_TOKEN_EXPIRY=1d
+
+REFRESH_TOKEN_SECRET=your_refresh_token_secret
+REFRESH_TOKEN_EXPIRY=10d
+
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+```
+
+> ⚠️ Never commit your `.env` file or expose your API keys publicly.
+
+---
+
+# 🔐 Environment Variables
+
+| Variable                | Description                    |
+| ----------------------- | ------------------------------ |
+| `PORT`                  | Server port                    |
+| `MONGODB_URL`           | MongoDB connection string      |
+| `DB_NAME`               | MongoDB database name          |
+| `CORS_ORIGIN`           | Allowed frontend origin        |
+| `ACCESS_TOKEN_SECRET`   | Secret used for access tokens  |
+| `ACCESS_TOKEN_EXPIRY`   | Access token expiry            |
+| `REFRESH_TOKEN_SECRET`  | Secret used for refresh tokens |
+| `REFRESH_TOKEN_EXPIRY`  | Refresh token expiry           |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name          |
+| `CLOUDINARY_API_KEY`    | Cloudinary API key             |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret          |
+
+---
+
+# 🚀 Running the Project
+
+### Development
+
+```bash
+npm run dev
+```
+
+### Production
+
+```bash
+npm start
+```
+
+The API will be available at:
+
+```text
+http://localhost:8000
+```
+
+---
+
+# 🌐 API Base URL
+
+### Local
+
+```text
+http://localhost:8000/api/v1
+```
+
+### Production
+
+```text
+YOUR_DEPLOYED_API_URL/api/v1
+```
+
+> Replace `YOUR_DEPLOYED_API_URL` with your actual deployed backend URL.
+
+---
+
+# 📡 API Documentation
+
+## 🔐 Authentication & User APIs
+
+|  Method | Endpoint                   | Description       |
+| :-----: | -------------------------- | ----------------- |
+|  `POST` | `/users/login`             | Login user        |
+|  `POST` | `/users/logout`            | Logout user       |
+| `PATCH` | `/users/changePassword`    | Change password   |
+| `PATCH` | `/users/updateAvatar`      | Update avatar     |
+|  `GET`  | `/users/profile/:username` | Get user profile  |
+|  `GET`  | `/users/history`           | Get watch history |
+
+---
+
+### 🔑 Login
+
+```http
 POST /api/v1/users/login
+```
+
+Example request:
+
+```json
 {
   "email": "user@example.com",
   "password": "yourPassword"
 }
-🚪 Logout
+```
 
-POST
+---
 
-/api/v1/users/logout
+### 🚪 Logout
 
-Logs the currently authenticated user out and invalidates the active authentication session.
-
-Example:
-
+```http
 POST /api/v1/users/logout
-🔑 Change Password
+```
 
-PATCH
+Logs out the currently authenticated user.
 
-/api/v1/users/changePassword
+---
 
-Allows an authenticated user to change their account password.
+### 🔐 Change Password
+
+```http
+PATCH /api/v1/users/changePassword
+```
 
 Example:
 
-PATCH /api/v1/users/changePassword
+```json
 {
   "oldPassword": "oldPassword",
   "newPassword": "newPassword"
 }
-🖼️ Update Avatar
+```
 
-PATCH
+---
 
-/api/v1/users/updateAvatar
+### 🖼️ Update Avatar
 
-Updates the authenticated user's profile avatar.
-
-Example:
-
+```http
 PATCH /api/v1/users/updateAvatar
-Form Data:
-avatar = <image file>
-👤 Get User Profile
-
-GET
-
-/api/v1/users/profile/:username
-
-Fetches the public profile information of a user using their username.
+```
 
 Example:
 
+```text
+Content-Type: multipart/form-data
+
+avatar: <image-file>
+```
+
+---
+
+### 👤 Get User Profile
+
+```http
+GET /api/v1/users/profile/:username
+```
+
+Example:
+
+```http
 GET /api/v1/users/profile/aditya
+```
 
-Here:
+---
 
-:username = aditya
-🕘 Get Watch History
+### 🕘 Get Watch History
 
-GET
-
-/api/v1/users/history
-
-Returns the authenticated user's video watch history.
-
-Example:
-
+```http
 GET /api/v1/users/history
-🎥 2. Video APIs
+```
 
-These APIs are responsible for uploading, retrieving and managing videos.
+Returns the authenticated user's watch history.
 
-⬆️ Upload Video
+---
 
-POST
+# 🎥 Video APIs
 
-/api/v1/videoRouter/uploade-video
+|  Method | Endpoint                             | Description           |
+| :-----: | ------------------------------------ | --------------------- |
+|  `POST` | `/videoRouter/uploade-video`         | Upload video          |
+|  `GET`  | `/videoRouter/getVideo/:videoId`     | Get a video           |
+|  `GET`  | `/videoRouter/getAllVideo/:userId`   | Get user's videos     |
+| `PATCH` | `/videoRouter/video-toggle/:videoId` | Toggle publish status |
 
-Uploads a new video along with its required information such as title, description and thumbnail.
+---
 
-Example:
+### 📤 Upload Video
 
+```http
 POST /api/v1/videoRouter/uploade-video
-Form Data:
+```
 
-videoFile = <video file>
-thumbnail = <image file>
-title = My First Video
-description = This is my first video
-🎬 Get Video
+Example form data:
 
-GET
+```text
+videoFile    → <video-file>
+thumbnail    → <image-file>
+title        → My First Video
+description  → This is my first video
+```
 
-/api/v1/videoRouter/getVideo/:videoId
+The uploaded media is processed and stored using Cloudinary.
 
-Fetches information about a specific video using its video ID.
+---
 
-Example:
+### 🎬 Get Video
 
-GET /api/v1/videoRouter/getVideo/64abc123...
-
-Here:
-
-:videoId = 64abc123...
-📺 Get All Videos of a User
-
-GET
-
-/api/v1/videoRouter/getAllVideo/:userId
-
-Returns all videos uploaded by a particular user.
+```http
+GET /api/v1/videoRouter/getVideo/:videoId
+```
 
 Example:
 
-GET /api/v1/videoRouter/getAllVideo/64abc123...
+```http
+GET /api/v1/videoRouter/getVideo/VIDEO_ID
+```
 
-Here:
+---
 
-:userId = 64abc123...
-🌐 Toggle Video Publish Status
+### 📺 Get User Videos
 
-PATCH
-
-/api/v1/videoRouter/video-toggle/:videoId
-
-Changes the video's publish status.
-
-For example:
-
-Published → Unpublished
-Unpublished → Published
+```http
+GET /api/v1/videoRouter/getAllVideo/:userId
+```
 
 Example:
 
-PATCH /api/v1/videoRouter/video-toggle/64abc123...
-👥 3. Subscription APIs
+```http
+GET /api/v1/videoRouter/getAllVideo/USER_ID
+```
 
-Subscription APIs allow users to subscribe/unsubscribe to channels and retrieve subscriber information.
+Returns videos uploaded by the specified user.
 
-🔄 Toggle Subscribe
+---
 
-POST
+### 🌐 Toggle Publish Status
 
-/api/v1/subscription/toggle/:channelId
+```http
+PATCH /api/v1/videoRouter/video-toggle/:videoId
+```
 
-Subscribes the authenticated user to a channel. Calling the endpoint again can toggle the subscription off.
+Toggles the video's publish state:
 
-Example:
+```text
+Published
+    ↓
+Unpublished
+    ↓
+Published
+```
 
-POST /api/v1/subscription/toggle/64abc123...
+---
 
-Here:
+# 👥 Subscription APIs
 
-:channelId = ID of the channel/user
-👥 Get Channel Subscribers
+| Method | Endpoint                                            | Description             |
+| :----: | --------------------------------------------------- | ----------------------- |
+| `POST` | `/subscription/toggle/:channelId`                   | Subscribe / unsubscribe |
+|  `GET` | `/subscription/channel/:channelId/subscribers`      | Get channel subscribers |
+|  `GET` | `/subscription/channel/:subscriberId/subscribed-to` | Get subscribed channels |
 
-GET
+---
 
-/api/v1/subscription/channel/:channelId/subscribers
+### 🔄 Subscribe / Unsubscribe
 
-Returns the users who have subscribed to a particular channel.
-
-Example:
-
-GET /api/v1/subscription/channel/64abc123.../subscribers
-
-Here:
-
-:channelId = ID of the channel
-📺 Get Channels Subscribed By User
-
-GET
-
-/api/v1/subscription/channel/:subscriberId/subscribed-to
-
-Returns all channels that a particular user has subscribed to.
-
-Example:
-
-GET /api/v1/subscription/channel/64abc123.../subscribed-to
-
-Here:
-
-:subscriberId = ID of the subscriber
-❤️ 4. Like APIs
-
-Like APIs handle likes on videos and comments.
-
-❤️ Toggle Video Like
-
-POST
-
-/api/v1/like/video-like/:videoId
-
-Likes or unlikes a video for the authenticated user.
+```http
+POST /api/v1/subscription/toggle/:channelId
+```
 
 Example:
 
-POST /api/v1/like/video-like/64abc123...
+```http
+POST /api/v1/subscription/toggle/CHANNEL_ID
+```
 
-Calling the endpoint again can toggle the like:
+Calling the endpoint toggles the subscription state.
 
-Like → Unlike
-Unlike → Like
-👍 Get All Likes of a Video
+---
 
-GET
+### 👥 Get Channel Subscribers
 
-/api/v1/like/video-AllLike/:videoId
-
-Returns information about the likes associated with a particular video.
-
-Example:
-
-GET /api/v1/like/video-AllLike/64abc123...
-
-Here:
-
-:videoId = ID of the video
-💬 Like a Comment
-
-POST
-
-/api/v1/like/video-like-on-comment/:commentId
-
-Likes or unlikes a comment.
+```http
+GET /api/v1/subscription/channel/:channelId/subscribers
+```
 
 Example:
 
-POST /api/v1/like/video-like-on-comment/64abc123...
+```http
+GET /api/v1/subscription/channel/CHANNEL_ID/subscribers
+```
 
-Here:
+Returns users subscribed to the channel.
 
-:commentId = ID of the comment
-💬 5. Comment APIs
+---
 
-Comment APIs allow users to create and delete comments on videos.
+### 📺 Get Subscribed Channels
 
-💬 Add Comment to Video
-
-POST
-
-/api/v1/comments/:videoId
-
-Adds a comment to a specific video.
+```http
+GET /api/v1/subscription/channel/:subscriberId/subscribed-to
+```
 
 Example:
 
-POST /api/v1/comments/64abc123...
+```http
+GET /api/v1/subscription/channel/USER_ID/subscribed-to
+```
+
+Returns channels followed by the specified user.
+
+---
+
+# ❤️ Like APIs
+
+| Method | Endpoint                                 | Description           |
+| :----: | ---------------------------------------- | --------------------- |
+| `POST` | `/like/video-like/:videoId`              | Like / unlike video   |
+|  `GET` | `/like/video-AllLike/:videoId`           | Get video likes       |
+| `POST` | `/like/video-like-on-comment/:commentId` | Like / unlike comment |
+
+---
+
+### ❤️ Like / Unlike Video
+
+```http
+POST /api/v1/like/video-like/:videoId
+```
+
+Example:
+
+```http
+POST /api/v1/like/video-like/VIDEO_ID
+```
+
+The endpoint toggles the user's like state.
+
+```text
+Like
+ ↓
+Unlike
+ ↓
+Like
+```
+
+---
+
+### 👍 Get Video Likes
+
+```http
+GET /api/v1/like/video-AllLike/:videoId
+```
+
+Example:
+
+```http
+GET /api/v1/like/video-AllLike/VIDEO_ID
+```
+
+Returns information about users who liked the video.
+
+---
+
+### 💬 Like / Unlike Comment
+
+```http
+POST /api/v1/like/video-like-on-comment/:commentId
+```
+
+Example:
+
+```http
+POST /api/v1/like/video-like-on-comment/COMMENT_ID
+```
+
+---
+
+# 💬 Comment APIs
+
+|  Method  | Endpoint                 | Description    |
+| :------: | ------------------------ | -------------- |
+|  `POST`  | `/comments/:videoId`     | Add comment    |
+| `DELETE` | `/comments/c/:commentId` | Delete comment |
+
+---
+
+### 💬 Add Comment
+
+```http
+POST /api/v1/comments/:videoId
+```
+
+Example:
+
+```http
+POST /api/v1/comments/VIDEO_ID
+```
+
+Request body:
+
+```json
 {
   "content": "Great video! 🔥"
 }
+```
 
-Here:
+---
 
-:videoId = ID of the video
-🗑️ Delete Comment
+### 🗑️ Delete Comment
 
-DELETE
-
-/api/v1/comments/c/:commentId
-
-Deletes a comment created by the authenticated user.
+```http
+DELETE /api/v1/comments/c/:commentId
+```
 
 Example:
 
-DELETE /api/v1/comments/c/64abc123...
+```http
+DELETE /api/v1/comments/c/COMMENT_ID
+```
 
-Here:
+Deletes the specified comment.
 
-:commentId = ID of the comment
-🔐 Authentication
+---
 
-Endpoints that modify user data or perform actions on behalf of a user require authentication.
+# 🔒 Authentication
 
-For example:
+Some endpoints require an authenticated user.
 
-Login
+Typical flow:
+
+```text
+┌───────────────┐
+│     Login     │
+└───────┬───────┘
+        │
+        ▼
+┌───────────────────┐
+│ Authentication    │
+│ Token / Cookies   │
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
+│ Protected APIs    │
+│                   │
+│ • Upload Video    │
+│ • Like            │
+│ • Subscribe       │
+│ • Comment         │
+│ • Change Password │
+└───────────────────┘
+```
+
+---
+
+# 🧪 Testing APIs
+
+The APIs can be tested using tools such as:
+
+* Postman
+* Thunder Client
+* Insomnia
+* Frontend applications
+* Mobile applications
+
+### Example
+
+```text
+Client
+   │
+   │ POST /api/v1/users/login
+   ▼
+Express Server
+   │
+   ▼
+Authentication Middleware
+   │
+   ▼
+Controller
+   │
+   ▼
+MongoDB
+   │
+   ▼
+JSON Response
+```
+
+---
+
+# ☁️ Deployment
+
+The backend can be deployed to platforms such as:
+
+* Render
+* Railway
+* AWS
+* DigitalOcean
+* Other Node.js compatible hosting platforms
+
+### Production checklist
+
+Before deploying:
+
+```text
+✓ Set production environment variables
+✓ Configure MongoDB
+✓ Configure Cloudinary
+✓ Configure CORS
+✓ Never expose .env
+✓ Use production secrets
+✓ Test all protected routes
+✓ Test file uploads
+✓ Test database connection
+```
+
+### Production URL
+
+```text
+API:
+YOUR_PRODUCTION_API_URL
+```
+
+```text
+API Base:
+YOUR_PRODUCTION_API_URL/api/v1
+```
+
+### API Documentation
+
+```text
+Postman Collection:
+YOUR_POSTMAN_COLLECTION_URL
+```
+
+---
+
+# 📊 API Overview
+
+```text
+                    YouTube Backend
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+      Users              Videos          Subscriptions
+        │                  │                  │
+        │                  │                  │
+        ▼                  ▼                  ▼
+ Authentication      Upload / Get       Subscribe
+ Profile             Publish            Subscribers
+ History             Manage             Channels
+        │                  │                  │
+        └──────────────────┼──────────────────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │    Likes    │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │  Comments   │
+                    └─────────────┘
+```
+
+---
+
+# 🔮 Future Improvements
+
+Planned improvements for future versions:
+
+* [ ] Video streaming support
+* [ ] Video pagination
+* [ ] Search functionality
+* [ ] Trending videos
+* [ ] Recommended videos
+* [ ] View count system
+* [ ] Playlist management
+* [ ] Tweet / community system
+* [ ] Advanced caching
+* [ ] Redis integration
+* [ ] Rate limiting
+* [ ] API documentation with Swagger
+* [ ] Docker support
+* [ ] Automated testing
+* [ ] CI/CD pipeline
+* [ ] Performance monitoring
+* [ ] Horizontal scaling
+
+---
+
+# 🚀 Future Scaling Architecture
+
+The current backend can later be extended into a more scalable architecture:
+
+```text
+                         ┌───────────────┐
+                         │    Client     │
+                         └───────┬───────┘
+                                 │
+                                 ▼
+                         ┌───────────────┐
+                         │ Load Balancer │
+                         └───────┬───────┘
+                                 │
+                  ┌──────────────┼──────────────┐
+                  ▼              ▼              ▼
+             ┌─────────┐   ┌─────────┐   ┌─────────┐
+             │ API #1  │   │ API #2  │   │ API #3  │
+             └────┬────┘   └────┬────┘   └────┬────┘
+                  │              │              │
+                  └──────────────┼──────────────┘
+                                 ▼
+                         ┌───────────────┐
+                         │     Redis     │
+                         │    Cache      │
+                         └───────┬───────┘
+                                 │
+                                 ▼
+                         ┌───────────────┐
+                         │    MongoDB    │
+                         └───────────────┘
+                                 │
+                                 ▼
+                         ┌───────────────┐
+                         │  Cloudinary   │
+                         │     CDN       │
+                         └───────────────┘
+```
+
+---
+
+# 🤝 Contributing
+
+Contributions, issues and feature requests are welcome.
+
+If you want to contribute:
+
+```bash
+git clone YOUR_REPOSITORY_URL
+cd BACKEND
+npm install
+```
+
+Create a new branch:
+
+```bash
+git checkout -b feature/new-feature
+```
+
+Make your changes and submit a pull request.
+
+---
+
+# 📄 License
+
+This project is licensed under the **MIT License**.
+
+---
+
+# 👨‍💻 Author
+
+**Aditya Nayak**
+
+Built as a backend engineering project to understand:
+
+```text
+Node.js
+   ↓
+Express.js
+   ↓
+REST APIs
+   ↓
+MongoDB
    ↓
 Authentication
    ↓
-Access Protected APIs
+File Uploads
    ↓
-Logout
+Cloudinary
+   ↓
+Production Deployment
+```
 
-Protected APIs include operations such as:
+---
 
-Upload Video
-Change Password
-Update Avatar
-Subscribe
-Like Video
-Like Comment
-Add Comment
-Delete Comment
-Publish/Unpublish Video
-Get Watch History
-📋 Quick API Reference
-Category	Method	Endpoint	Purpose
-User	POST	/users/login	Login user
-User	POST	/users/logout	Logout user
-User	PATCH	/users/changePassword	Change password
-User	PATCH	/users/updateAvatar	Update avatar
-User	GET	/users/profile/:username	Get user profile
-User	GET	/users/history	Get watch history
-Video	POST	/videoRouter/uploade-video	Upload video
-Video	GET	/videoRouter/getVideo/:videoId	Get video
-Video	GET	/videoRouter/getAllVideo/:userId	Get user's videos
-Video	PATCH	/videoRouter/video-toggle/:videoId	Toggle publish status
-Subscription	POST	/subscription/toggle/:channelId	Subscribe/unsubscribe
-Subscription	GET	/subscription/channel/:channelId/subscribers	Get subscribers
-Subscription	GET	/subscription/channel/:subscriberId/subscribed-to	Get subscribed channels
-Like	POST	/like/video-like/:videoId	Like/unlike video
-Like	GET	/like/video-AllLike/:videoId	Get video likes
-Like	POST	/like/video-like-on-comment/:commentId	Like/unlike comment
-Comment	POST	/comments/:videoId	Add comment
-Comment	DELETE	/comments/c/:commentId	Delete comment
+## ⭐ Support
+
+If you found this project useful, consider giving the repository a ⭐ on GitHub.
+
+**Repository:**
+`YOUR_GITHUB_REPOSITORY_URL`
+
+**Live API:**
+`YOUR_PRODUCTION_API_URL`
+
+**Postman Collection:**
+`YOUR_POSTMAN_COLLECTION_URL`
