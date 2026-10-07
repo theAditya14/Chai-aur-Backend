@@ -45,416 +45,372 @@ I know I still have a lot to learn, but I am enjoying the process and trying to 
 🚀 **This is just the beginning of my Backend Development Journey.**
 
 
-<!-- what i do in registration  -->
+🎬 YouTube Backend API Documentation
 
-    step 1 - get user details from frontend
-    step 2 - validation - not empty
-    step 3 - check if user already exists: username,email
-    step 4 - check for images, check for avatar
-    step 5 - upload them to cloudinary , avatar
-    step 6 - create user object - create entry in db
-    step 7 - remove password and refresh token field from response
-    step 8 - check for user creation 
-    step 9 - return res
+This backend provides REST APIs for a YouTube-like video platform. It supports user authentication, video management, subscriptions, likes, and comments.
 
-------------------
-Login System . 
+Base URL:
 
-  1. we need to get users passsword ,email,username
-  2. check the email or username is given by user or not
-  3.find the user .  yes/not
-  4. check passowrd is correct or not .
-  5. access and refresh token check or send   (some code ,top of the code)
-  6. res cookies.
-
-<img width="965" height="791" alt="Screenshot 2026-09-21 161204" src="https://github.com/user-attachments/assets/e21f7f91-13cd-408d-a188-e871211ec0ca" />
-
-----------------------------------------
-
-How subscribe a User to another User/Channel .
-
-   # 🔔 Subscription System
-
-Subscription system ka purpose hai:
-
-> **Kaun kis user/channel ko subscribe kar raha hai?**
+YOUR_BASE_URL/api/v1
 
 Example:
 
-```text
-Rahul ───────────→ Aditya
-subscriber          channel
-```
+https://your-domain.com/api/v1
+📌 API Structure
+/api/v1
+│
+├── users
+│   ├── Authentication
+│   ├── Profile
+│   └── History
+│
+├── videoRouter
+│   ├── Upload Video
+│   ├── Get Videos
+│   └── Publish/Unpublish
+│
+├── subscription
+│   ├── Subscribe / Unsubscribe
+│   ├── Channel Subscribers
+│   └── Subscribed Channels
+│
+├── like
+│   ├── Video Likes
+│   └── Comment Likes
+│
+└── comments
+    ├── Add Comment
+    └── Delete Comment
+👤 1. User APIs
 
----
+User APIs handle authentication, profile management, password changes and watch history.
 
-## 1. Data Model
+🔐 Login
 
-`Subscription` ek **relationship collection** hai.
+POST
 
-```text
-Subscription
-├── subscriber → User ID
-└── channel    → User ID
-```
+/api/v1/users/login
 
-Example:
-
-```text
-subscriber = R456   // Rahul
-channel    = A123   // Aditya
-```
-
-Meaning:
-
-```text
-Rahul → Aditya
-```
-
-### Golden Rule
-
-```text
-subscriber = jo Subscribe karta hai
-channel    = jisko Subscribe kiya ja raha hai
-```
-
----
-
-## 2. Complete Flow
-
-```text
-              FRONTEND
-                 │
-                 │ Aditya's _id
-                 ↓
-        POST /subscribe/A123
-                 │
-                 ↓
-              BACKEND
-                 │
-        ┌────────┴────────┐
-        │                 │
-        ↓                 ↓
-  channelId          verifyJWT
-    A123                  │
-                          ↓
-                   req.user._id
-                       R456
-        │                 │
-        ↓                 ↓
-      Aditya            Rahul
-        │                 │
-        └────────┬────────┘
-                 ↓
-          SUBSCRIPTION
-                 │
-                 ↓
-       subscriber: R456
-       channel:    A123
-                 │
-                 ↓
-              MongoDB
-```
-
-
-
-
-
-<img width="1082" height="674" alt="image" src="https://github.com/user-attachments/assets/7b58ec7f-9bc1-450f-94e0-152040d88458" />
-
-<img width="1202" height="362" alt="image" src="https://github.com/user-attachments/assets/005ffcea-bd6f-4c76-89a5-c440d703685e" />
-
-<img width="1202" height="462" alt="image" src="https://github.com/user-attachments/assets/7c51cf26-791f-4c8f-8165-9bf43603d510" />
-
-
-
-
----
-
-## 3. Frontend Se Kya Aayega?
-
-Frontend ko sirf **target channel ki ID** bhejni hai.
-
-Agar Rahul Aditya ki profile par hai:
-
-```text
-Aditya._id = A123
-```
-
-Request:
-
-```http
-POST /api/v1/subscription/subscriber/A123
-```
-
-Frontend ko `Rahul` ki ID bhejne ki zarurat nahi hai.
-
----
-
-## 4. Rahul Ki ID Kahan Se Aayegi?
-
-Rahul already logged in hai.
-
-```text
-Login
-  ↓
-JWT / Cookie
-  ↓
-verifyJWT
-  ↓
-req.user
-  ↓
-Rahul
-```
-
-Therefore:
-
-```text
-req.user._id = R456
-```
-
-So backend automatically knows:
-
-```text
-subscriber = Rahul
-```
-
----
-
-## 5. Subscribe Logic
-
-```text
-User clicks Subscribe
-        ↓
-Get channelId
-        ↓
-Get logged-in user
-        ↓
-Check existing subscription
-        ↓
-     ┌──────┴──────┐
-     │             │
-   EXISTS        NOT EXISTS
-     │             │
-     ↓             ↓
-   DELETE         CREATE
-     │             │
-     ↓             ↓
- Unsubscribe    Subscribe
-```
-
-### Pseudocode
-
-```text
-FUNCTION toggleSubscription:
-
-    channelId = request.params.channelId
-
-    subscriberId = req.user._id
-
-    Find:
-        subscriber = subscriberId
-        channel = channelId
-
-    IF found:
-        delete subscription
-        return "Unsubscribed"
-
-    ELSE:
-        create subscription
-        return "Subscribed"
-```
-
----
-
-## 6. API Route
-
-`app.js`:
-
-```js
-app.use("/api/v1/subscription", subscription);
-```
-
-`subscription.routes.js`:
-
-```js
-subscription
-    .route("/subscriber/:channelId")
-    .post(toggleSubscription);
-```
-
-Final API:
-
-```text
-POST /api/v1/subscription/subscriber/:channelId
-```
+Logs an existing user into the application and creates the required authentication session/token.
 
 Example:
 
-```text
-POST http://localhost:8000/api/v1/subscription/subscriber/A123
-```
-
----
-
-## 7. Database Example
-
-```json
+POST /api/v1/users/login
 {
-  "subscriber": "R456",
-  "channel": "A123"
+  "email": "user@example.com",
+  "password": "yourPassword"
 }
-```
+🚪 Logout
 
-Meaning:
+POST
 
-```text
-Rahul ─────────→ Aditya
-```
+/api/v1/users/logout
 
----
+Logs the currently authenticated user out and invalidates the active authentication session.
 
-## 8. `$lookup` Kahan Use Hoga?
+Example:
 
-Subscription me mostly IDs hoti hain:
+POST /api/v1/users/logout
+🔑 Change Password
 
-```text
-subscriber: R456
-channel: A123
-```
+PATCH
 
-Agar hume actual user information chahiye:
+/api/v1/users/changePassword
 
-```text
-username
-avatar
-email
-```
+Allows an authenticated user to change their account password.
 
-to `$lookup` se `User` collection se data la sakte hain.
+Example:
 
-```text
-Subscription
-      │
-      ├── subscriber → User
-      │
-      └── channel    → User
-```
+PATCH /api/v1/users/changePassword
+{
+  "oldPassword": "oldPassword",
+  "newPassword": "newPassword"
+}
+🖼️ Update Avatar
 
----
+PATCH
 
-## 9. Is Model Se Kya-Kya Kar Sakte Hain?
+/api/v1/users/updateAvatar
 
-### Subscriber Count
+Updates the authenticated user's profile avatar.
 
-```text
-channel = Aditya
-        ↓
-count subscriptions
-        ↓
-Aditya's subscribers
-```
+Example:
 
-### Aditya Ke Subscribers
+PATCH /api/v1/users/updateAvatar
+Form Data:
+avatar = <image file>
+👤 Get User Profile
 
-```text
-channel = Aditya
-        ↓
-find subscribers
-        ↓
-$lookup → User
-```
+GET
 
-### Rahul Ne Kinhe Subscribe Kiya?
+/api/v1/users/profile/:username
 
-```text
-subscriber = Rahul
-        ↓
-find channels
-        ↓
-$lookup → User
-```
+Fetches the public profile information of a user using their username.
 
-### Is Rahul Subscribed To Aditya?
+Example:
 
-```text
-subscriber = Rahul
-AND
-channel = Aditya
-```
+GET /api/v1/users/profile/aditya
 
-Found → `true`
+Here:
 
-Not found → `false`
+:username = aditya
+🕘 Get Watch History
 
----
+GET
 
-# 🧠 Final Mental Model
+/api/v1/users/history
 
-```text
-Frontend
-   │
-   │ "Kisko subscribe karna hai?"
+Returns the authenticated user's video watch history.
+
+Example:
+
+GET /api/v1/users/history
+🎥 2. Video APIs
+
+These APIs are responsible for uploading, retrieving and managing videos.
+
+⬆️ Upload Video
+
+POST
+
+/api/v1/videoRouter/uploade-video
+
+Uploads a new video along with its required information such as title, description and thumbnail.
+
+Example:
+
+POST /api/v1/videoRouter/uploade-video
+Form Data:
+
+videoFile = <video file>
+thumbnail = <image file>
+title = My First Video
+description = This is my first video
+🎬 Get Video
+
+GET
+
+/api/v1/videoRouter/getVideo/:videoId
+
+Fetches information about a specific video using its video ID.
+
+Example:
+
+GET /api/v1/videoRouter/getVideo/64abc123...
+
+Here:
+
+:videoId = 64abc123...
+📺 Get All Videos of a User
+
+GET
+
+/api/v1/videoRouter/getAllVideo/:userId
+
+Returns all videos uploaded by a particular user.
+
+Example:
+
+GET /api/v1/videoRouter/getAllVideo/64abc123...
+
+Here:
+
+:userId = 64abc123...
+🌐 Toggle Video Publish Status
+
+PATCH
+
+/api/v1/videoRouter/video-toggle/:videoId
+
+Changes the video's publish status.
+
+For example:
+
+Published → Unpublished
+Unpublished → Published
+
+Example:
+
+PATCH /api/v1/videoRouter/video-toggle/64abc123...
+👥 3. Subscription APIs
+
+Subscription APIs allow users to subscribe/unsubscribe to channels and retrieve subscriber information.
+
+🔄 Toggle Subscribe
+
+POST
+
+/api/v1/subscription/toggle/:channelId
+
+Subscribes the authenticated user to a channel. Calling the endpoint again can toggle the subscription off.
+
+Example:
+
+POST /api/v1/subscription/toggle/64abc123...
+
+Here:
+
+:channelId = ID of the channel/user
+👥 Get Channel Subscribers
+
+GET
+
+/api/v1/subscription/channel/:channelId/subscribers
+
+Returns the users who have subscribed to a particular channel.
+
+Example:
+
+GET /api/v1/subscription/channel/64abc123.../subscribers
+
+Here:
+
+:channelId = ID of the channel
+📺 Get Channels Subscribed By User
+
+GET
+
+/api/v1/subscription/channel/:subscriberId/subscribed-to
+
+Returns all channels that a particular user has subscribed to.
+
+Example:
+
+GET /api/v1/subscription/channel/64abc123.../subscribed-to
+
+Here:
+
+:subscriberId = ID of the subscriber
+❤️ 4. Like APIs
+
+Like APIs handle likes on videos and comments.
+
+❤️ Toggle Video Like
+
+POST
+
+/api/v1/like/video-like/:videoId
+
+Likes or unlikes a video for the authenticated user.
+
+Example:
+
+POST /api/v1/like/video-like/64abc123...
+
+Calling the endpoint again can toggle the like:
+
+Like → Unlike
+Unlike → Like
+👍 Get All Likes of a Video
+
+GET
+
+/api/v1/like/video-AllLike/:videoId
+
+Returns information about the likes associated with a particular video.
+
+Example:
+
+GET /api/v1/like/video-AllLike/64abc123...
+
+Here:
+
+:videoId = ID of the video
+💬 Like a Comment
+
+POST
+
+/api/v1/like/video-like-on-comment/:commentId
+
+Likes or unlikes a comment.
+
+Example:
+
+POST /api/v1/like/video-like-on-comment/64abc123...
+
+Here:
+
+:commentId = ID of the comment
+💬 5. Comment APIs
+
+Comment APIs allow users to create and delete comments on videos.
+
+💬 Add Comment to Video
+
+POST
+
+/api/v1/comments/:videoId
+
+Adds a comment to a specific video.
+
+Example:
+
+POST /api/v1/comments/64abc123...
+{
+  "content": "Great video! 🔥"
+}
+
+Here:
+
+:videoId = ID of the video
+🗑️ Delete Comment
+
+DELETE
+
+/api/v1/comments/c/:commentId
+
+Deletes a comment created by the authenticated user.
+
+Example:
+
+DELETE /api/v1/comments/c/64abc123...
+
+Here:
+
+:commentId = ID of the comment
+🔐 Authentication
+
+Endpoints that modify user data or perform actions on behalf of a user require authentication.
+
+For example:
+
+Login
    ↓
-channelId
-   │
+Authentication
    ↓
-Backend
-   │
-   │ "Kaun subscribe kar raha hai?"
+Access Protected APIs
    ↓
-JWT → req.user
-   │
-   ↓
-Subscription
-   │
-   ├── subscriber
-   └── channel
-   │
-   ↓
-MongoDB
-```
+Logout
 
-### Remember:
+Protected APIs include operations such as:
 
-> **Frontend gives `channelId`.**
-> **JWT gives `subscriberId`.**
-> **Backend connects them.**
-> **MongoDB stores the relationship.**
-
-```text
-subscriber ─────────→ channel
-
-Rahul ──────────────→ Aditya
-```
-
-
-
- FUNCTION toggleSubscription:
-
-  Get channelId from request URL
-   Get logged-in user's ID from JWT
-    ↓
-    subscriberId = req.user._id
-     Check:
-      Does subscription exist where:
-       subscriber = subscriberId 
-       AND
-        channel = channelId 
-        IF subscription exists:
-         Delete that subscription 
-         Return: "Unsubscribed successfully"
-          ELSE:
-           Create new subscription: 
-           subscriber = subscriberId
-          channel = channelId 
-          Return: "Subscribed successfully"
-
-    
-<!-- GET All Subscribers of Channel -->
-
-  // step 1:  Get channel ID 
-  // step 2: Check channelId
-  // step 3: Check channel/user exists ?
-  // step 4:  Find all subscribers
-   // 5. Send response
+Upload Video
+Change Password
+Update Avatar
+Subscribe
+Like Video
+Like Comment
+Add Comment
+Delete Comment
+Publish/Unpublish Video
+Get Watch History
+📋 Quick API Reference
+Category	Method	Endpoint	Purpose
+User	POST	/users/login	Login user
+User	POST	/users/logout	Logout user
+User	PATCH	/users/changePassword	Change password
+User	PATCH	/users/updateAvatar	Update avatar
+User	GET	/users/profile/:username	Get user profile
+User	GET	/users/history	Get watch history
+Video	POST	/videoRouter/uploade-video	Upload video
+Video	GET	/videoRouter/getVideo/:videoId	Get video
+Video	GET	/videoRouter/getAllVideo/:userId	Get user's videos
+Video	PATCH	/videoRouter/video-toggle/:videoId	Toggle publish status
+Subscription	POST	/subscription/toggle/:channelId	Subscribe/unsubscribe
+Subscription	GET	/subscription/channel/:channelId/subscribers	Get subscribers
+Subscription	GET	/subscription/channel/:subscriberId/subscribed-to	Get subscribed channels
+Like	POST	/like/video-like/:videoId	Like/unlike video
+Like	GET	/like/video-AllLike/:videoId	Get video likes
+Like	POST	/like/video-like-on-comment/:commentId	Like/unlike comment
+Comment	POST	/comments/:videoId	Add comment
+Comment	DELETE	/comments/c/:commentId	Delete comment
